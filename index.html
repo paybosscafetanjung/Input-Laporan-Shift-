@@ -135,16 +135,10 @@
      <form id="kasForm">
       <div class="form-grid">
        <div class="form-group">
-        <label for="kas-staff">Nama Staff *</label>
+        <label for="kas-staff">Nama Staff (Kasir) *</label>
         <select id="kas-staff" required>
          <option value="">-- Pilih Nama --</option>
-         <option value="Rusdhani">Rusdhani (Kasir)</option>
-         <option value="Jihan Permata Sari">Jihan Permata Sari (Kasir)</option>
-         <option value="Nahjatus Sabela">Nahjatus Sabela (Kasir)</option>
-         <option value="Ilham Ali Naufal">Ilham Ali Naufal</option>
-         <option value="Muhammad Zikrillah">Muhammad Zikrillah</option>
-         <option value="Renita Aulia Jasmin">Renita Aulia Jasmin</option>
-         <option value="Lainnya">Lainnya</option>
+         <!-- Populated by JS -->
         </select>
        </div>
        <div class="form-group">
@@ -193,7 +187,7 @@
     <div class="history-section">
      <h3>📊 Riwayat Shift Hari Ini</h3>
      <div class="history-list" id="kas-history">
-      <div class="empty-state">Memuat data... (Perlu Login untuk Melihat)</div>
+      <div class="empty-state">Memuat data...</div>
      </div>
     </div>
    </div>
@@ -204,6 +198,13 @@
      <h2>📦 Update Stok Dapur</h2>
      <form id="dapurForm">
       <div class="form-grid">
+       <div class="form-group">
+        <label for="dapur-staff">Nama Staff (Chef/Koki) *</label>
+        <select id="dapur-staff" required>
+         <option value="">-- Pilih Nama --</option>
+         <!-- Populated by JS -->
+        </select>
+       </div>
        <div class="form-group">
         <label for="dapur-item">Nama Barang *</label>
         <input type="text" id="dapur-item" list="dapur-items" required placeholder="Ketik atau pilih...">
@@ -248,6 +249,13 @@
      <h2>🍷 Update Stok Bar</h2>
      <form id="barForm">
       <div class="form-grid">
+       <div class="form-group">
+        <label for="bar-staff">Nama Staff (Barista) *</label>
+        <select id="bar-staff" required>
+         <option value="">-- Pilih Nama --</option>
+         <!-- Populated by JS -->
+        </select>
+       </div>
        <div class="form-group">
         <label for="bar-item">Nama Barang *</label>
         <input type="text" id="bar-item" list="bar-items" required placeholder="Ketik atau pilih...">
@@ -313,37 +321,74 @@
 
     let isAppStarted = false;
 
-    // Main initialization function
+    // --- DATA KARYAWAN TERPUSAT ---
+    const staffList = [
+        { name: "Ilham Ali Naufal", role: "Pramusaji" },
+        { name: "Muhammad Zikrillah", role: "Pramusaji" },
+        { name: "Renita Aulia Jasmin", role: "Bartender" },
+        { name: "Rifky Arya Ramadhani", role: "Pramusaji" },
+        { name: "Ahmad Maulidan Noor", role: "Bartender" },
+        { name: "Rusdhani", role: "Kasir" },
+        { name: "Fitri Ainur Sabita", role: "Chef" },
+        { name: "Shada Amalia", role: "Chef" },
+        { name: "Ovy Putri Novia", role: "Chef" },
+        { name: "Jihan Permata Sari", role: "Kasir" },
+        { name: "Samlawi", role: "Bartender" },
+        { name: "Iqbal Arasyid", role: "Chef" },
+        { name: "Ansyari Fachmi Ridhani", role: "Bartender" },
+        { name: "Nahjatus Sabela", role: "Kasir" },
+        { name: "Komang sri yati utami", role: "Chef" }
+    ];
+
+    function populateStaffSelects() {
+        const kasirSelect = document.getElementById('kas-staff');
+        const dapurSelect = document.getElementById('dapur-staff');
+        const barSelect = document.getElementById('bar-staff');
+
+        // 1. Kasir (Hanya Kasir & Lainnya)
+        const kasirs = staffList.filter(s => s.role === "Kasir");
+        kasirSelect.innerHTML = '<option value="">-- Pilih Nama --</option>';
+        kasirs.forEach(s => kasirSelect.innerHTML += `<option value="${s.name}">${s.name} (${s.role})</option>`);
+        kasirSelect.innerHTML += `<option value="Lainnya">Lainnya</option>`;
+
+        // 2. Dapur (Chef & Lainnya)
+        const chefs = staffList.filter(s => s.role === "Chef");
+        const othersDapur = staffList.filter(s => s.role !== "Chef"); 
+        
+        dapurSelect.innerHTML = '<option value="">-- Pilih Chef/Koki --</option>';
+        chefs.forEach(s => dapurSelect.innerHTML += `<option value="${s.name}">${s.name} (${s.role})</option>`);
+        dapurSelect.innerHTML += '<option disabled>-- Karyawan Lain --</option>';
+        othersDapur.forEach(s => dapurSelect.innerHTML += `<option value="${s.name}">${s.name} (${s.role})</option>`);
+
+        // 3. Bar (Bartender & Lainnya)
+        const bartenders = staffList.filter(s => s.role === "Bartender");
+        const othersBar = staffList.filter(s => s.role !== "Bartender");
+
+        barSelect.innerHTML = '<option value="">-- Pilih Barista --</option>';
+        bartenders.forEach(s => barSelect.innerHTML += `<option value="${s.name}">${s.name} (${s.role})</option>`);
+        barSelect.innerHTML += '<option disabled>-- Karyawan Lain --</option>';
+        othersBar.forEach(s => barSelect.innerHTML += `<option value="${s.name}">${s.name} (${s.role})</option>`);
+    }
+
     function startAppListeners() {
         if (isAppStarted) return;
         isAppStarted = true;
         console.log("Starting app listeners...");
+        populateStaffSelects(); // Isi dropdown nama
         loadShiftHistory();
         loadInventory('inventory_kitchen', 'dapur-stock-list', 'dapur-items');
         loadInventory('inventory_bar', 'bar-stock-list', 'bar-items');
     }
 
-    // Auth with Fallback
     const initAuth = async () => {
-        try {
-            await signInAnonymously(auth);
-        } catch (error) {
-            console.warn("Auth Warning: Anonymous login disabled or failed.", error.code);
-            // Fallback: Start app anyway because rules are "if true"
-            startAppListeners();
-        }
+        try { await signInAnonymously(auth); } 
+        catch (error) { console.warn("Auth failed, starting anyway.", error.code); startAppListeners(); }
     };
     initAuth();
 
-    onAuthStateChanged(auth, (user) => {
-        if (user) {
-            console.log("Connected as:", user.uid);
-            startAppListeners();
-        }
-    });
+    onAuthStateChanged(auth, (user) => { if (user) startAppListeners(); });
 
     // --- UI & Logic ---
-    
     function updateCurrentShift() {
         const hour = new Date().getHours();
         let shift = 'Pagi', cls = 'shift-pagi';
@@ -394,81 +439,55 @@
                 shift: updateCurrentShift(), 
                 date: getOperationalDateString(),
                 realDate: new Date().toLocaleDateString('id-ID'),
-                startCash: modal,
-                cashSales: cash,
+                startCash: modal, cashSales: cash, 
                 qrisSales: parseInt(document.getElementById('penjualan-qris').value) || 0,
-                expenses: bon,
-                bonDescription: document.getElementById('bon-desc').value,
-                expectedCash: expected,
-                physicalCash: fisik,
-                difference: fisik - expected,
+                expenses: bon, bonDescription: document.getElementById('bon-desc').value,
+                expectedCash: expected, physicalCash: fisik, difference: fisik - expected,
                 notes: document.getElementById('shift-notes').value,
-                timestamp: serverTimestamp(),
-                createdAt: serverTimestamp()
+                timestamp: serverTimestamp(), createdAt: serverTimestamp()
             });
 
             showToast('✅ Laporan Berhasil Disimpan!');
             document.getElementById('kasForm').reset();
             document.getElementById('calc-total').textContent = 'Rp 0';
-        } catch (err) {
-            console.error(err);
-            showToast('❌ Gagal menyimpan: ' + err.message);
-        } finally {
-            btn.disabled = false; btn.textContent = '💾 Simpan Laporan';
-        }
+        } catch (err) { console.error(err); showToast('❌ Gagal menyimpan'); } 
+        finally { btn.disabled = false; btn.textContent = '💾 Simpan Laporan'; }
     });
 
     function loadShiftHistory() {
-        // Shift Reports might require auth based on rules. 
-        // We wrap this in try-catch via error callback to handle permission denied gracefully.
         try {
             const q = query(getColRef("shift_reports"), orderBy("createdAt", "desc"));
             onSnapshot(q, (snapshot) => {
                 const container = document.getElementById('kas-history');
                 const todayOperational = getOperationalDateString();
-                
                 const logs = snapshot.docs.map(d => d.data()).filter(d => d.date === todayOperational);
 
-                if (logs.length === 0) {
-                    container.innerHTML = '<div class="empty-state">Belum ada laporan hari ini</div>';
-                    return;
-                }
+                if (logs.length === 0) { container.innerHTML = '<div class="empty-state">Belum ada laporan hari ini</div>'; return; }
 
                 container.innerHTML = logs.map(log => `
                     <div class="history-item">
-                        <div>
-                            <div style="font-weight: 700; color: #334155;">${log.staffName} <span style="font-weight:400; color: #94a3b8;">(${log.shift})</span></div>
-                            <div style="font-size: 11px; margin-top: 2px;">Fisik: ${formatRupiah(log.physicalCash)}</div>
-                        </div>
-                        <div style="text-align: right;">
-                            <div style="font-size: 11px; color: #94a3b8;">Selisih</div>
-                            <div style="font-weight: 700; color: ${log.difference < 0 ? '#ef4444' : '#10b981'};">
-                                ${log.difference > 0 ? '+' : ''}${formatRupiah(log.difference)}
-                            </div>
-                        </div>
+                        <div><div style="font-weight: 700; color: #334155;">${log.staffName} <span style="font-weight:400; color: #94a3b8;">(${log.shift})</span></div><div style="font-size: 11px; margin-top: 2px;">Fisik: ${formatRupiah(log.physicalCash)}</div></div>
+                        <div style="text-align: right;"><div style="font-size: 11px; color: #94a3b8;">Selisih</div><div style="font-weight: 700; color: ${log.difference < 0 ? '#ef4444' : '#10b981'};">${log.difference > 0 ? '+' : ''}${formatRupiah(log.difference)}</div></div>
                     </div>
                 `).join('');
-            }, (error) => {
-                console.warn("History access denied (Auth required):", error.code);
-                document.getElementById('kas-history').innerHTML = '<div class="empty-state text-red-400">Login diperlukan untuk melihat riwayat</div>';
-            });
-        } catch(e) {
-            console.warn("History init error:", e);
-        }
+            }, (error) => { console.warn("History denied"); document.getElementById('kas-history').innerHTML = '<div class="empty-state text-red-400">Login diperlukan</div>'; });
+        } catch(e) {}
     }
 
     const handleStockSubmit = async (e, type) => {
         e.preventDefault();
         const collName = type === 'dapur' ? 'inventory_kitchen' : 'inventory_bar';
+        const staffField = type === 'dapur' ? 'dapur-staff' : 'bar-staff';
         const btn = document.getElementById(`${type}-submit-btn`);
         btn.disabled = true; btn.textContent = '⏳ Mengupdate...';
 
+        const staffName = document.getElementById(staffField).value;
         const itemName = document.getElementById(`${type}-item`).value.trim();
         const qty = parseInt(document.getElementById(`${type}-qty`).value) || 0;
         const movement = document.getElementById(`${type}-movement`).value;
 
-        if (!itemName || qty <= 0) {
-            showToast('⚠️ Cek input data!');
+        if (!staffName || !itemName || qty <= 0) {
+            showToast('⚠️ Lengkapi semua data!');
             btn.disabled = false; btn.textContent = `💾 Update Stok ${type}`;
             return;
         }
@@ -481,29 +500,16 @@
                 const docId = snapshot.docs[0].id;
                 const currentStock = snapshot.docs[0].data().stock || 0;
                 const newStock = movement === 'masuk' ? currentStock + qty : currentStock - qty;
-                
-                await updateDoc(doc(db, collName, docId), {
-                    stock: newStock,
-                    lastUpdate: serverTimestamp()
-                });
+                await updateDoc(doc(db, collName, docId), { stock: newStock, lastUpdate: serverTimestamp(), lastUser: staffName });
             } else {
-                const initialStock = movement === 'masuk' ? qty : 0;
                 await addDoc(getColRef(collName), {
-                    name: itemName,
-                    stock: initialStock,
-                    unit: 'pcs',
-                    lastUpdate: serverTimestamp()
+                    name: itemName, stock: movement === 'masuk' ? qty : 0, unit: 'pcs', lastUpdate: serverTimestamp(), lastUser: staffName
                 });
             }
-            
             showToast(`✅ Stok ${itemName} diupdate!`);
             document.getElementById(`${type}Form`).reset();
-        } catch (err) {
-            console.error(err);
-            showToast('❌ Gagal (Cek Koneksi/Rules)');
-        } finally {
-            btn.disabled = false; btn.textContent = `💾 Update Stok ${type}`;
-        }
+        } catch (err) { console.error(err); showToast('❌ Gagal update'); } 
+        finally { btn.disabled = false; btn.textContent = `💾 Update Stok ${type}`; }
     };
 
     document.getElementById('dapurForm').addEventListener('submit', (e) => handleStockSubmit(e, 'dapur'));
@@ -517,19 +523,14 @@
             const items = snapshot.docs.map(d => d.data());
 
             datalist.innerHTML = items.map(i => `<option value="${i.name}">`).join('');
-
-            if (items.length === 0) {
-                container.innerHTML = '<div class="empty-state">Stok kosong</div>';
-                return;
-            }
+            if (items.length === 0) { container.innerHTML = '<div class="empty-state">Stok kosong</div>'; return; }
 
             container.innerHTML = items.map(item => `
                 <div class="stock-item-card">
                     <div class="stock-item-name">${item.name}</div>
                     <div class="stock-item-qty">${item.stock}</div>
-                    <div class="stock-item-info">
-                        ${item.lastUpdate ? new Date(item.lastUpdate.seconds*1000).toLocaleTimeString('id-ID', {hour:'2-digit', minute:'2-digit'}) : 'Baru'}
-                    </div>
+                    <div class="stock-item-info">User: ${item.lastUser || '-'}</div>
+                    <div class="stock-item-info" style="margin-top:2px;">${item.lastUpdate ? new Date(item.lastUpdate.seconds*1000).toLocaleTimeString('id-ID', {hour:'2-digit', minute:'2-digit'}) : 'Baru'}</div>
                 </div>
             `).join('');
         });
@@ -541,23 +542,16 @@
     };
 
     function formatRupiah(num) { return 'Rp ' + (num || 0).toLocaleString('id-ID'); }
-
-    function showToast(msg) {
-        const t = document.getElementById('toast');
-        t.textContent = msg; t.classList.add('show');
-        setTimeout(() => t.classList.remove('show'), 3000);
-    }
+    function showToast(msg) { const t = document.getElementById('toast'); t.textContent = msg; t.classList.add('show'); setTimeout(() => t.classList.remove('show'), 3000); }
 
     document.querySelectorAll('.tab-btn').forEach(btn => {
         btn.addEventListener('click', () => {
             document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
             document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
-            
             btn.classList.add('active');
             document.getElementById(btn.dataset.tab + '-tab').classList.add('active');
         });
     });
-
   </script>
  </body>
 </html>
