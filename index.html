@@ -1,0 +1,556 @@
+<!doctype html>
+<html lang="id">
+ <head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Staff Operations - PayBoss Connected</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <style>
+    body {
+      box-sizing: border-box; margin: 0; padding: 0;
+      font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      min-height: 100vh; width: 100%;
+    }
+    * { box-sizing: border-box; }
+
+    .staff-container { width: 100%; min-height: 100%; padding: 20px; max-width: 800px; margin: 0 auto; }
+
+    .header {
+      background: white; padding: 24px; border-radius: 16px;
+      box-shadow: 0 4px 20px rgba(0,0,0,0.1); margin-bottom: 20px;
+    }
+    .header h1 { margin: 0 0 8px 0; color: #1a202c; font-size: 28px; font-weight: 700; }
+    .header p { margin: 0; color: #718096; font-size: 14px; }
+
+    .tabs { display: flex; gap: 12px; margin-bottom: 20px; flex-wrap: wrap; }
+    .tab-btn {
+      flex: 1; min-width: 120px; padding: 16px 24px; background: white; border: none;
+      border-radius: 12px; cursor: pointer; font-size: 15px; font-weight: 600; color: #4a5568;
+      box-shadow: 0 2px 10px rgba(0,0,0,0.08); transition: all 0.3s ease;
+    }
+    .tab-btn:hover { transform: translateY(-2px); box-shadow: 0 4px 15px rgba(0,0,0,0.12); }
+    .tab-btn.active { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; }
+
+    .tab-content { display: none; animation: fadeIn 0.4s ease; }
+    .tab-content.active { display: block; }
+    @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+
+    .form-card {
+      background: white; padding: 24px; border-radius: 16px;
+      box-shadow: 0 4px 20px rgba(0,0,0,0.1); margin-bottom: 20px;
+    }
+    .form-card h2 { margin: 0 0 20px 0; color: #2d3748; font-size: 20px; font-weight: 700; display: flex; align-items: center; gap: 8px; }
+
+    .form-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 16px; margin-bottom: 16px; }
+    .form-group { display: flex; flex-direction: column; }
+    .form-group label { margin-bottom: 8px; color: #4a5568; font-weight: 600; font-size: 13px; text-transform: uppercase; letter-spacing: 0.5px; }
+    .form-group input, .form-group select, .form-group textarea {
+      padding: 12px; border: 2px solid #e2e8f0; border-radius: 10px; font-size: 15px; transition: border-color 0.3s ease; width: 100%;
+    }
+    .form-group input:focus, .form-group select:focus { outline: none; border-color: #667eea; }
+
+    .shift-badge { display: inline-block; padding: 6px 12px; border-radius: 20px; font-size: 13px; font-weight: 700; margin-bottom: 16px; }
+    .shift-pagi { background: #fef3c7; color: #92400e; }
+    .shift-siang { background: #dbeafe; color: #1e3a8a; }
+    .shift-malam { background: #ede9fe; color: #5b21b6; }
+
+    .calculator-box {
+      background: #f8fafc; padding: 20px; border-radius: 12px; margin: 20px 0;
+      border-left: 5px solid #667eea; box-shadow: inset 0 2px 4px rgba(0,0,0,0.02);
+    }
+    .calc-row { display: flex; justify-content: space-between; align-items: center; padding: 8px 0; font-size: 14px; color: #64748b; }
+    .calc-row.total {
+      border-top: 2px dashed #cbd5e0; margin-top: 12px; padding-top: 16px;
+      font-size: 18px; font-weight: 700; color: #1e293b;
+    }
+
+    .submit-btn {
+      width: 100%; padding: 16px; background: linear-gradient(135deg, #48bb78 0%, #38a169 100%);
+      color: white; border: none; border-radius: 12px; font-size: 16px; font-weight: 700;
+      cursor: pointer; transition: all 0.3s ease; margin-top: 16px;
+      box-shadow: 0 4px 12px rgba(72, 187, 120, 0.3);
+    }
+    .submit-btn:hover { transform: translateY(-2px); filter: brightness(1.05); }
+    .submit-btn:active { transform: translateY(0); }
+    .submit-btn:disabled { background: #cbd5e0; cursor: not-allowed; transform: none; box-shadow: none; }
+
+    .stock-list { display: grid; grid-template-columns: repeat(auto-fill, minmax(140px, 1fr)); gap: 12px; margin-top: 20px; }
+    .stock-item-card {
+      background: #f8fafc; padding: 16px; border-radius: 12px; border: 1px solid #e2e8f0;
+      transition: all 0.3s ease; text-align: center;
+    }
+    .stock-item-card:hover { border-color: #667eea; transform: translateY(-3px); box-shadow: 0 4px 12px rgba(0,0,0,0.05); }
+    .stock-item-name { font-weight: 600; color: #334155; font-size: 14px; margin-bottom: 4px; }
+    .stock-item-qty { font-size: 24px; font-weight: 800; color: #667eea; }
+    .stock-item-info { font-size: 11px; color: #94a3b8; margin-top: 8px; }
+
+    .quick-add-buttons { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 16px; }
+    .quick-add-btn {
+      padding: 8px 16px; background: #edf2f7; border: 1px solid #cbd5e0; border-radius: 20px;
+      cursor: pointer; font-size: 12px; font-weight: 600; color: #4a5568; transition: all 0.2s;
+    }
+    .quick-add-btn:hover { background: #667eea; color: white; border-color: #667eea; }
+
+    .history-section { background: white; padding: 24px; border-radius: 16px; margin-top: 20px; }
+    .history-section h3 { margin: 0 0 16px 0; color: #2d3748; font-size: 18px; font-weight: 700; }
+    .history-list { display: flex; flex-direction: column; gap: 12px; max-height: 300px; overflow-y: auto; }
+    .history-item {
+      padding: 12px; background: #f8fafc; border-radius: 8px; border-left: 4px solid #667eea;
+      font-size: 13px; color: #475569; display: flex; justify-content: space-between; align-items: center;
+    }
+
+    .toast {
+      position: fixed; bottom: 24px; right: 24px; background: #1e293b; color: white;
+      padding: 14px 24px; border-radius: 10px; box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+      display: none; z-index: 2000; font-weight: 600; font-size: 14px;
+      animation: slideUp 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    }
+    .toast.show { display: block; }
+    @keyframes slideUp { from { transform: translateY(50px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
+
+    .empty-state { text-align: center; color: #94a3b8; padding: 20px; font-size: 14px; font-style: italic; }
+  </style>
+ </head>
+ <body>
+
+  <div class="staff-container">
+   <header class="header">
+    <h1>👨‍🍳 Staff Operations</h1>
+    <p>Portal Operasional Harian PayBoss Cafe</p>
+   </header>
+
+   <div class="tabs">
+    <button class="tab-btn active" data-tab="kas">💵 Kas &amp; Shift</button>
+    <button class="tab-btn" data-tab="dapur">📦 Stok Dapur</button>
+    <button class="tab-btn" data-tab="bar">🍷 Stok Bar</button>
+   </div>
+
+   <!-- Tab Kas & Shift -->
+   <div class="tab-content active" id="kas-tab">
+    <div class="form-card">
+     <h2>💵 Input Laporan Shift</h2>
+     <div id="current-shift-badge"></div>
+     
+     <form id="kasForm">
+      <div class="form-grid">
+       <div class="form-group">
+        <label for="kas-staff">Nama Staff *</label>
+        <select id="kas-staff" required>
+         <option value="">-- Pilih Nama --</option>
+         <option value="Rusdhani">Rusdhani (Kasir)</option>
+         <option value="Jihan Permata Sari">Jihan Permata Sari (Kasir)</option>
+         <option value="Nahjatus Sabela">Nahjatus Sabela (Kasir)</option>
+         <option value="Ilham Ali Naufal">Ilham Ali Naufal</option>
+         <option value="Muhammad Zikrillah">Muhammad Zikrillah</option>
+         <option value="Renita Aulia Jasmin">Renita Aulia Jasmin</option>
+         <option value="Lainnya">Lainnya</option>
+        </select>
+       </div>
+       <div class="form-group">
+        <label for="modal-awal">Modal Awal (Rp) *</label>
+        <input type="number" id="modal-awal" min="0" required placeholder="0">
+       </div>
+       <div class="form-group">
+        <label for="penjualan-qris">Penjualan QRIS (Rp)</label>
+        <input type="number" id="penjualan-qris" min="0" value="0" placeholder="0">
+       </div>
+       <div class="form-group">
+        <label for="penjualan-cash">Penjualan Cash (Rp)</label>
+        <input type="number" id="penjualan-cash" min="0" value="0" placeholder="0">
+       </div>
+       <div class="form-group">
+        <label for="bon-keluar">Bon/Uang Keluar (Rp)</label>
+        <input type="number" id="bon-keluar" min="0" value="0" placeholder="0">
+       </div>
+       <div class="form-group">
+        <label for="bon-desc">Keterangan Bon</label>
+        <input type="text" id="bon-desc" placeholder="Contoh: Beli Gas, Es Batu">
+       </div>
+      </div>
+
+      <div class="calculator-box">
+       <div class="calc-row"><span>Modal Awal:</span> <strong id="calc-modal">Rp 0</strong></div>
+       <div class="calc-row"><span>Penjualan Cash:</span> <strong id="calc-cash">Rp 0</strong></div>
+       <div class="calc-row"><span>Bon Keluar:</span> <strong id="calc-bon" style="color: #ef4444;">- Rp 0</strong></div>
+       <div class="calc-row total"><span>Uang Fisik Seharusnya:</span> <strong id="calc-total" style="color: #667eea;">Rp 0</strong></div>
+      </div>
+
+      <div class="form-group">
+          <label for="fisik-laci" style="color: #1e3a8a;">Hitung Fisik Uang di Laci (Wajib) *</label>
+          <input type="number" id="fisik-laci" style="border: 2px solid #1e3a8a; background: #eff6ff;" required placeholder="Total uang tunai di laci">
+      </div>
+
+      <div class="form-group" style="margin-top: 12px;">
+        <label for="shift-notes">Catatan (Opsional)</label>
+        <textarea id="shift-notes" rows="2" placeholder="Ada selisih uang? Jelaskan di sini..."></textarea>
+      </div>
+
+      <button type="submit" class="submit-btn" id="kas-submit-btn">💾 Simpan Laporan</button>
+     </form>
+    </div>
+
+    <div class="history-section">
+     <h3>📊 Riwayat Shift Hari Ini</h3>
+     <div class="history-list" id="kas-history">
+      <div class="empty-state">Belum ada data shift masuk hari ini</div>
+     </div>
+    </div>
+   </div>
+
+   <!-- Tab Stok Dapur -->
+   <div class="tab-content" id="dapur-tab">
+    <div class="form-card">
+     <h2>📦 Update Stok Dapur</h2>
+     <form id="dapurForm">
+      <div class="form-grid">
+       <div class="form-group">
+        <label for="dapur-item">Nama Barang *</label>
+        <input type="text" id="dapur-item" list="dapur-items" required placeholder="Ketik atau pilih...">
+        <datalist id="dapur-items"></datalist>
+       </div>
+       <div class="form-group">
+        <label for="dapur-qty">Jumlah *</label>
+        <input type="number" id="dapur-qty" min="1" required placeholder="0">
+       </div>
+       <div class="form-group">
+        <label for="dapur-movement">Aksi *</label>
+        <select id="dapur-movement" required>
+         <option value="masuk">➕ Barang Masuk (Beli/Datang)</option>
+         <option value="keluar">➖ Barang Keluar (Dipakai/Rusak)</option>
+        </select>
+       </div>
+      </div>
+      
+      <div class="quick-add-buttons">
+        <button type="button" class="quick-add-btn" onclick="quickFill('dapur', 'Beras')">Beras</button>
+        <button type="button" class="quick-add-btn" onclick="quickFill('dapur', 'Minyak Goreng')">Minyak</button>
+        <button type="button" class="quick-add-btn" onclick="quickFill('dapur', 'Telur')">Telur</button>
+        <button type="button" class="quick-add-btn" onclick="quickFill('dapur', 'Ayam')">Ayam</button>
+        <button type="button" class="quick-add-btn" onclick="quickFill('dapur', 'Daging Sapi')">Daging</button>
+      </div>
+
+      <button type="submit" class="submit-btn" id="dapur-submit-btn">💾 Update Stok Dapur</button>
+     </form>
+    </div>
+
+    <div class="form-card">
+     <h2>📊 Stok Dapur Real-time</h2>
+     <div class="stock-list" id="dapur-stock-list">
+      <div class="empty-state">Memuat data stok...</div>
+     </div>
+    </div>
+   </div>
+
+   <!-- Tab Stok Bar -->
+   <div class="tab-content" id="bar-tab">
+    <div class="form-card">
+     <h2>🍷 Update Stok Bar</h2>
+     <form id="barForm">
+      <div class="form-grid">
+       <div class="form-group">
+        <label for="bar-item">Nama Barang *</label>
+        <input type="text" id="bar-item" list="bar-items" required placeholder="Ketik atau pilih...">
+        <datalist id="bar-items"></datalist>
+       </div>
+       <div class="form-group">
+        <label for="bar-qty">Jumlah *</label>
+        <input type="number" id="bar-qty" min="1" required placeholder="0">
+       </div>
+       <div class="form-group">
+        <label for="bar-movement">Aksi *</label>
+        <select id="bar-movement" required>
+         <option value="masuk">➕ Barang Masuk (Beli/Datang)</option>
+         <option value="keluar">➖ Barang Keluar (Dipakai/Rusak)</option>
+        </select>
+       </div>
+      </div>
+
+      <div class="quick-add-buttons">
+        <button type="button" class="quick-add-btn" onclick="quickFill('bar', 'Kopi Bubuk')">Kopi</button>
+        <button type="button" class="quick-add-btn" onclick="quickFill('bar', 'Susu UHT')">Susu</button>
+        <button type="button" class="quick-add-btn" onclick="quickFill('bar', 'Sirup Vanilla')">Sirup Vnl</button>
+        <button type="button" class="quick-add-btn" onclick="quickFill('bar', 'Es Batu')">Es Batu</button>
+        <button type="button" class="quick-add-btn" onclick="quickFill('bar', 'Gula Cair')">Gula Cair</button>
+      </div>
+
+      <button type="submit" class="submit-btn" id="bar-submit-btn">💾 Update Stok Bar</button>
+     </form>
+    </div>
+
+    <div class="form-card">
+     <h2>📊 Stok Bar Real-time</h2>
+     <div class="stock-list" id="bar-stock-list">
+      <div class="empty-state">Memuat data stok...</div>
+     </div>
+    </div>
+   </div>
+
+  </div>
+  
+  <div id="toast" class="toast">Notifikasi</div>
+
+  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/11.0.2/firebase-app.js";
+    import { getFirestore, collection, addDoc, onSnapshot, serverTimestamp, query, orderBy, doc, updateDoc, where, getDocs } from "https://www.gstatic.com/firebasejs/11.0.2/firebase-firestore.js";
+    import { getAuth, signInAnonymously, onAuthStateChanged, signInWithCustomToken } from "https://www.gstatic.com/firebasejs/11.0.2/firebase-auth.js";
+
+    // 1. Firebase Config
+    const firebaseConfig = JSON.parse(__firebase_config);
+    const app = initializeApp(firebaseConfig);
+    const db = getFirestore(app);
+    const auth = getAuth(app);
+    const appId = typeof __app_id !== 'undefined' ? __app_id : 'default-app-id';
+
+    // Helper Path
+    const getColRef = (name) => collection(db, 'artifacts', appId, 'public', 'data', name);
+
+    // 2. Auth Init (Anonymous Login agar langsung jalan)
+    const initAuth = async () => {
+        if (typeof __initial_auth_token !== 'undefined' && __initial_auth_token) {
+            await signInWithCustomToken(auth, __initial_auth_token);
+        } else {
+            await signInAnonymously(auth);
+        }
+    };
+    initAuth();
+
+    onAuthStateChanged(auth, (user) => {
+        if (user) {
+            console.log("Connected as:", user.uid);
+            // Start Listeners
+            loadShiftHistory();
+            loadInventory('inventory_kitchen', 'dapur-stock-list', 'dapur-items');
+            loadInventory('inventory_bar', 'bar-stock-list', 'bar-items');
+        }
+    });
+
+    // 3. UI Logic: Shift & Calculator [UPDATED: Business Day Logic]
+    function updateCurrentShift() {
+        const hour = new Date().getHours();
+        let shift = 'Pagi', cls = 'shift-pagi';
+        
+        if (hour >= 16 && hour < 23) { shift = 'Siang'; cls = 'shift-siang'; }
+        else if (hour >= 23 || hour < 8) { shift = 'Malam'; cls = 'shift-malam'; }
+
+        const badge = document.getElementById('current-shift-badge');
+        badge.innerHTML = `<span class="shift-badge ${cls}">Shift ${shift} Aktif</span>`;
+        return shift;
+    }
+    updateCurrentShift();
+    setInterval(updateCurrentShift, 60000);
+
+    // [NEW FUNCTION] Get Business Date (Operational Date)
+    // Tanggal yang disimpan di database harus mundur 1 hari jika jam < 08:00
+    function getOperationalDateString() {
+        const now = new Date();
+        // Jika jam 00:00 - 07:59, dianggap masih hari kemarin
+        if (now.getHours() < 8) {
+            now.setDate(now.getDate() - 1);
+        }
+        return now.toLocaleDateString('id-ID');
+    }
+
+    // Calculator Listeners
+    ['modal-awal', 'penjualan-cash', 'bon-keluar'].forEach(id => {
+        document.getElementById(id).addEventListener('input', () => {
+            const modal = parseInt(document.getElementById('modal-awal').value) || 0;
+            const cash = parseInt(document.getElementById('penjualan-cash').value) || 0;
+            const bon = parseInt(document.getElementById('bon-keluar').value) || 0;
+            const total = modal + cash - bon;
+
+            document.getElementById('calc-modal').textContent = formatRupiah(modal);
+            document.getElementById('calc-cash').textContent = formatRupiah(cash);
+            document.getElementById('calc-bon').textContent = "- " + formatRupiah(bon);
+            document.getElementById('calc-total').textContent = formatRupiah(total);
+        });
+    });
+
+    // 4. Backend Logic: Submit Shift [UPDATED]
+    document.getElementById('kasForm').addEventListener('submit', async (e) => {
+        e.preventDefault();
+        const btn = document.getElementById('kas-submit-btn');
+        btn.disabled = true; btn.textContent = '⏳ Menyimpan ke Server...';
+
+        try {
+            const modal = parseInt(document.getElementById('modal-awal').value) || 0;
+            const cash = parseInt(document.getElementById('penjualan-cash').value) || 0;
+            const bon = parseInt(document.getElementById('bon-keluar').value) || 0;
+            const fisik = parseInt(document.getElementById('fisik-laci').value) || 0;
+            const expected = modal + cash - bon;
+
+            await addDoc(getColRef('shift_reports'), {
+                staffName: document.getElementById('kas-staff').value,
+                shift: updateCurrentShift(), 
+                date: getOperationalDateString(), // [UPDATED] Gunakan tanggal operasional
+                realDate: new Date().toLocaleDateString('id-ID'), // Tetap simpan tanggal asli untuk audit
+                startCash: modal,
+                cashSales: cash,
+                qrisSales: parseInt(document.getElementById('penjualan-qris').value) || 0,
+                expenses: bon,
+                bonDescription: document.getElementById('bon-desc').value,
+                expectedCash: expected,
+                physicalCash: fisik,
+                difference: fisik - expected,
+                notes: document.getElementById('shift-notes').value,
+                timestamp: serverTimestamp(),
+                createdAt: serverTimestamp()
+            });
+
+            showToast('✅ Laporan Shift Berhasil Disimpan!');
+            document.getElementById('kasForm').reset();
+            document.getElementById('calc-total').textContent = 'Rp 0';
+        } catch (err) {
+            console.error(err);
+            showToast('❌ Gagal menyimpan: ' + err.message);
+        } finally {
+            btn.disabled = false; btn.textContent = '💾 Simpan Laporan';
+        }
+    });
+
+    // Load History [UPDATED: Filter by Operational Date]
+    function loadShiftHistory() {
+        const q = query(getColRef("shift_reports"), orderBy("createdAt", "desc"));
+        onSnapshot(q, (snapshot) => {
+            const container = document.getElementById('kas-history');
+            const todayOperational = getOperationalDateString(); // Gunakan tanggal operasional
+            
+            // Filter hanya tampilkan laporan "Hari Ini" (secara operasional)
+            const logs = snapshot.docs.map(d => d.data()).filter(d => d.date === todayOperational);
+
+            if (logs.length === 0) {
+                container.innerHTML = '<div class="empty-state">Belum ada laporan masuk hari ini</div>';
+                return;
+            }
+
+            container.innerHTML = logs.map(log => `
+                <div class="history-item">
+                    <div>
+                        <div style="font-weight: 700; color: #334155;">${log.staffName} <span style="font-weight:400; color: #94a3b8;">(${log.shift})</span></div>
+                        <div style="font-size: 11px; margin-top: 2px;">Fisik: ${formatRupiah(log.physicalCash)}</div>
+                    </div>
+                    <div style="text-align: right;">
+                        <div style="font-size: 11px; color: #94a3b8;">Selisih</div>
+                        <div style="font-weight: 700; color: ${log.difference < 0 ? '#ef4444' : '#10b981'};">
+                            ${log.difference > 0 ? '+' : ''}${formatRupiah(log.difference)}
+                        </div>
+                    </div>
+                </div>
+            `).join('');
+        });
+    }
+
+    // 5. Backend Logic: Inventory
+    const handleStockSubmit = async (e, type) => {
+        e.preventDefault();
+        const collName = type === 'dapur' ? 'inventory_kitchen' : 'inventory_bar';
+        const btn = document.getElementById(`${type}-submit-btn`);
+        btn.disabled = true; btn.textContent = '⏳ Mengupdate Stok...';
+
+        const itemName = document.getElementById(`${type}-item`).value.trim();
+        const qty = parseInt(document.getElementById(`${type}-qty`).value) || 0;
+        const movement = document.getElementById(`${type}-movement`).value;
+
+        if (!itemName || qty <= 0) {
+            showToast('⚠️ Cek nama barang dan jumlah!');
+            btn.disabled = false; btn.textContent = `💾 Update Stok ${type}`;
+            return;
+        }
+
+        try {
+            // Cek item ada atau tidak
+            const q = query(getColRef(collName), where('name', '==', itemName));
+            const snapshot = await getDocs(q);
+
+            if (!snapshot.empty) {
+                // Update Existing
+                const docId = snapshot.docs[0].id;
+                const currentStock = snapshot.docs[0].data().stock || 0;
+                const newStock = movement === 'masuk' ? currentStock + qty : currentStock - qty;
+                
+                await updateDoc(doc(db, 'artifacts', appId, 'public', 'data', collName, docId), {
+                    stock: newStock,
+                    lastUpdate: serverTimestamp()
+                });
+            } else {
+                // Create New
+                const initialStock = movement === 'masuk' ? qty : 0;
+                await addDoc(getColRef(collName), {
+                    name: itemName,
+                    stock: initialStock,
+                    unit: 'pcs',
+                    lastUpdate: serverTimestamp()
+                });
+            }
+            
+            showToast(`✅ Stok ${itemName} berhasil diupdate!`);
+            document.getElementById(`${type}Form`).reset();
+        } catch (err) {
+            console.error(err);
+            showToast('❌ Gagal update (Cek Koneksi/Rules)');
+        } finally {
+            btn.disabled = false; btn.textContent = `💾 Update Stok ${type}`;
+        }
+    };
+
+    document.getElementById('dapurForm').addEventListener('submit', (e) => handleStockSubmit(e, 'dapur'));
+    document.getElementById('barForm').addEventListener('submit', (e) => handleStockSubmit(e, 'bar'));
+
+    // Load & Render Inventory
+    function loadInventory(collName, listId, datalistId) {
+        const q = query(getColRef(collName), orderBy("name"));
+        onSnapshot(q, (snapshot) => {
+            const container = document.getElementById(listId);
+            const datalist = document.getElementById(datalistId);
+            const items = snapshot.docs.map(d => d.data());
+
+            // Auto-complete options
+            datalist.innerHTML = items.map(i => `<option value="${i.name}">`).join('');
+
+            if (items.length === 0) {
+                container.innerHTML = '<div class="empty-state">Stok masih kosong</div>';
+                return;
+            }
+
+            container.innerHTML = items.map(item => `
+                <div class="stock-item-card">
+                    <div class="stock-item-name">${item.name}</div>
+                    <div class="stock-item-qty">${item.stock}</div>
+                    <div class="stock-item-info">
+                        ${item.lastUpdate ? new Date(item.lastUpdate.seconds*1000).toLocaleTimeString('id-ID', {hour:'2-digit', minute:'2-digit'}) : 'Baru'}
+                    </div>
+                </div>
+            `).join('');
+        });
+    }
+
+    // 6. Utilities
+    window.quickFill = (type, item) => {
+        document.getElementById(`${type}-item`).value = item;
+        document.getElementById(`${type}-qty`).focus();
+    };
+
+    function formatRupiah(num) {
+        return 'Rp ' + (num || 0).toLocaleString('id-ID');
+    }
+
+    function showToast(msg) {
+        const t = document.getElementById('toast');
+        t.textContent = msg; t.classList.add('show');
+        setTimeout(() => t.classList.remove('show'), 3000);
+    }
+
+    // Tab Switching logic
+    document.querySelectorAll('.tab-btn').forEach(btn => {
+        btn.addEventListener('click', () => {
+            document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+            document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
+            
+            btn.classList.add('active');
+            document.getElementById(btn.dataset.tab + '-tab').classList.add('active');
+        });
+    });
+
+  </script>
+ </body>
+</html>
