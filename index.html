@@ -193,7 +193,7 @@
     <div class="history-section">
      <h3>📊 Riwayat Shift Hari Ini</h3>
      <div class="history-list" id="kas-history">
-      <div class="empty-state">Belum ada data shift masuk hari ini</div>
+      <div class="empty-state">Memuat data... (Perlu Login untuk Melihat)</div>
      </div>
     </div>
    </div>
@@ -293,24 +293,44 @@
   <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/11.0.2/firebase-app.js";
     import { getFirestore, collection, addDoc, onSnapshot, serverTimestamp, query, orderBy, doc, updateDoc, where, getDocs } from "https://www.gstatic.com/firebasejs/11.0.2/firebase-firestore.js";
-    import { getAuth, signInAnonymously, onAuthStateChanged, signInWithCustomToken } from "https://www.gstatic.com/firebasejs/11.0.2/firebase-auth.js";
+    import { getAuth, signInAnonymously, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.0.2/firebase-auth.js";
 
-    // 1. Firebase Config
-    const firebaseConfig = JSON.parse(__firebase_config);
+    const firebaseConfig = {
+      apiKey: "AIzaSyB0nHqdAw_dV9pHcQ_cSnWtNsn4CwwwUNc",
+      authDomain: "payboss-cafe-system.firebaseapp.com",
+      projectId: "payboss-cafe-system",
+      storageBucket: "payboss-cafe-system.firebasestorage.app",
+      messagingSenderId: "570523503793",
+      appId: "1:570523503793:web:0a7ba7ce751eb95a3f6690",
+      measurementId: "G-H1NJ369HE9"
+    };
+
     const app = initializeApp(firebaseConfig);
     const db = getFirestore(app);
     const auth = getAuth(app);
-    const appId = typeof __app_id !== 'undefined' ? __app_id : 'default-app-id';
 
-    // Helper Path
-    const getColRef = (name) => collection(db, 'artifacts', appId, 'public', 'data', name);
+    const getColRef = (name) => collection(db, name);
 
-    // 2. Auth Init (Anonymous Login agar langsung jalan)
+    let isAppStarted = false;
+
+    // Main initialization function
+    function startAppListeners() {
+        if (isAppStarted) return;
+        isAppStarted = true;
+        console.log("Starting app listeners...");
+        loadShiftHistory();
+        loadInventory('inventory_kitchen', 'dapur-stock-list', 'dapur-items');
+        loadInventory('inventory_bar', 'bar-stock-list', 'bar-items');
+    }
+
+    // Auth with Fallback
     const initAuth = async () => {
-        if (typeof __initial_auth_token !== 'undefined' && __initial_auth_token) {
-            await signInWithCustomToken(auth, __initial_auth_token);
-        } else {
+        try {
             await signInAnonymously(auth);
+        } catch (error) {
+            console.warn("Auth Warning: Anonymous login disabled or failed.", error.code);
+            // Fallback: Start app anyway because rules are "if true"
+            startAppListeners();
         }
     };
     initAuth();
@@ -318,40 +338,31 @@
     onAuthStateChanged(auth, (user) => {
         if (user) {
             console.log("Connected as:", user.uid);
-            // Start Listeners
-            loadShiftHistory();
-            loadInventory('inventory_kitchen', 'dapur-stock-list', 'dapur-items');
-            loadInventory('inventory_bar', 'bar-stock-list', 'bar-items');
+            startAppListeners();
         }
     });
 
-    // 3. UI Logic: Shift & Calculator [UPDATED: Business Day Logic]
+    // --- UI & Logic ---
+    
     function updateCurrentShift() {
         const hour = new Date().getHours();
         let shift = 'Pagi', cls = 'shift-pagi';
-        
         if (hour >= 16 && hour < 23) { shift = 'Siang'; cls = 'shift-siang'; }
         else if (hour >= 23 || hour < 8) { shift = 'Malam'; cls = 'shift-malam'; }
 
         const badge = document.getElementById('current-shift-badge');
-        badge.innerHTML = `<span class="shift-badge ${cls}">Shift ${shift} Aktif</span>`;
+        if (badge) badge.innerHTML = `<span class="shift-badge ${cls}">Shift ${shift} Aktif</span>`;
         return shift;
     }
     updateCurrentShift();
     setInterval(updateCurrentShift, 60000);
 
-    // [NEW FUNCTION] Get Business Date (Operational Date)
-    // Tanggal yang disimpan di database harus mundur 1 hari jika jam < 08:00
     function getOperationalDateString() {
         const now = new Date();
-        // Jika jam 00:00 - 07:59, dianggap masih hari kemarin
-        if (now.getHours() < 8) {
-            now.setDate(now.getDate() - 1);
-        }
+        if (now.getHours() < 8) now.setDate(now.getDate() - 1);
         return now.toLocaleDateString('id-ID');
     }
 
-    // Calculator Listeners
     ['modal-awal', 'penjualan-cash', 'bon-keluar'].forEach(id => {
         document.getElementById(id).addEventListener('input', () => {
             const modal = parseInt(document.getElementById('modal-awal').value) || 0;
@@ -366,11 +377,10 @@
         });
     });
 
-    // 4. Backend Logic: Submit Shift [UPDATED]
     document.getElementById('kasForm').addEventListener('submit', async (e) => {
         e.preventDefault();
         const btn = document.getElementById('kas-submit-btn');
-        btn.disabled = true; btn.textContent = '⏳ Menyimpan ke Server...';
+        btn.disabled = true; btn.textContent = '⏳ Menyimpan...';
 
         try {
             const modal = parseInt(document.getElementById('modal-awal').value) || 0;
@@ -382,8 +392,8 @@
             await addDoc(getColRef('shift_reports'), {
                 staffName: document.getElementById('kas-staff').value,
                 shift: updateCurrentShift(), 
-                date: getOperationalDateString(), // [UPDATED] Gunakan tanggal operasional
-                realDate: new Date().toLocaleDateString('id-ID'), // Tetap simpan tanggal asli untuk audit
+                date: getOperationalDateString(),
+                realDate: new Date().toLocaleDateString('id-ID'),
                 startCash: modal,
                 cashSales: cash,
                 qrisSales: parseInt(document.getElementById('penjualan-qris').value) || 0,
@@ -397,7 +407,7 @@
                 createdAt: serverTimestamp()
             });
 
-            showToast('✅ Laporan Shift Berhasil Disimpan!');
+            showToast('✅ Laporan Berhasil Disimpan!');
             document.getElementById('kasForm').reset();
             document.getElementById('calc-total').textContent = 'Rp 0';
         } catch (err) {
@@ -408,72 +418,75 @@
         }
     });
 
-    // Load History [UPDATED: Filter by Operational Date]
     function loadShiftHistory() {
-        const q = query(getColRef("shift_reports"), orderBy("createdAt", "desc"));
-        onSnapshot(q, (snapshot) => {
-            const container = document.getElementById('kas-history');
-            const todayOperational = getOperationalDateString(); // Gunakan tanggal operasional
-            
-            // Filter hanya tampilkan laporan "Hari Ini" (secara operasional)
-            const logs = snapshot.docs.map(d => d.data()).filter(d => d.date === todayOperational);
+        // Shift Reports might require auth based on rules. 
+        // We wrap this in try-catch via error callback to handle permission denied gracefully.
+        try {
+            const q = query(getColRef("shift_reports"), orderBy("createdAt", "desc"));
+            onSnapshot(q, (snapshot) => {
+                const container = document.getElementById('kas-history');
+                const todayOperational = getOperationalDateString();
+                
+                const logs = snapshot.docs.map(d => d.data()).filter(d => d.date === todayOperational);
 
-            if (logs.length === 0) {
-                container.innerHTML = '<div class="empty-state">Belum ada laporan masuk hari ini</div>';
-                return;
-            }
+                if (logs.length === 0) {
+                    container.innerHTML = '<div class="empty-state">Belum ada laporan hari ini</div>';
+                    return;
+                }
 
-            container.innerHTML = logs.map(log => `
-                <div class="history-item">
-                    <div>
-                        <div style="font-weight: 700; color: #334155;">${log.staffName} <span style="font-weight:400; color: #94a3b8;">(${log.shift})</span></div>
-                        <div style="font-size: 11px; margin-top: 2px;">Fisik: ${formatRupiah(log.physicalCash)}</div>
-                    </div>
-                    <div style="text-align: right;">
-                        <div style="font-size: 11px; color: #94a3b8;">Selisih</div>
-                        <div style="font-weight: 700; color: ${log.difference < 0 ? '#ef4444' : '#10b981'};">
-                            ${log.difference > 0 ? '+' : ''}${formatRupiah(log.difference)}
+                container.innerHTML = logs.map(log => `
+                    <div class="history-item">
+                        <div>
+                            <div style="font-weight: 700; color: #334155;">${log.staffName} <span style="font-weight:400; color: #94a3b8;">(${log.shift})</span></div>
+                            <div style="font-size: 11px; margin-top: 2px;">Fisik: ${formatRupiah(log.physicalCash)}</div>
+                        </div>
+                        <div style="text-align: right;">
+                            <div style="font-size: 11px; color: #94a3b8;">Selisih</div>
+                            <div style="font-weight: 700; color: ${log.difference < 0 ? '#ef4444' : '#10b981'};">
+                                ${log.difference > 0 ? '+' : ''}${formatRupiah(log.difference)}
+                            </div>
                         </div>
                     </div>
-                </div>
-            `).join('');
-        });
+                `).join('');
+            }, (error) => {
+                console.warn("History access denied (Auth required):", error.code);
+                document.getElementById('kas-history').innerHTML = '<div class="empty-state text-red-400">Login diperlukan untuk melihat riwayat</div>';
+            });
+        } catch(e) {
+            console.warn("History init error:", e);
+        }
     }
 
-    // 5. Backend Logic: Inventory
     const handleStockSubmit = async (e, type) => {
         e.preventDefault();
         const collName = type === 'dapur' ? 'inventory_kitchen' : 'inventory_bar';
         const btn = document.getElementById(`${type}-submit-btn`);
-        btn.disabled = true; btn.textContent = '⏳ Mengupdate Stok...';
+        btn.disabled = true; btn.textContent = '⏳ Mengupdate...';
 
         const itemName = document.getElementById(`${type}-item`).value.trim();
         const qty = parseInt(document.getElementById(`${type}-qty`).value) || 0;
         const movement = document.getElementById(`${type}-movement`).value;
 
         if (!itemName || qty <= 0) {
-            showToast('⚠️ Cek nama barang dan jumlah!');
+            showToast('⚠️ Cek input data!');
             btn.disabled = false; btn.textContent = `💾 Update Stok ${type}`;
             return;
         }
 
         try {
-            // Cek item ada atau tidak
             const q = query(getColRef(collName), where('name', '==', itemName));
             const snapshot = await getDocs(q);
 
             if (!snapshot.empty) {
-                // Update Existing
                 const docId = snapshot.docs[0].id;
                 const currentStock = snapshot.docs[0].data().stock || 0;
                 const newStock = movement === 'masuk' ? currentStock + qty : currentStock - qty;
                 
-                await updateDoc(doc(db, 'artifacts', appId, 'public', 'data', collName, docId), {
+                await updateDoc(doc(db, collName, docId), {
                     stock: newStock,
                     lastUpdate: serverTimestamp()
                 });
             } else {
-                // Create New
                 const initialStock = movement === 'masuk' ? qty : 0;
                 await addDoc(getColRef(collName), {
                     name: itemName,
@@ -483,11 +496,11 @@
                 });
             }
             
-            showToast(`✅ Stok ${itemName} berhasil diupdate!`);
+            showToast(`✅ Stok ${itemName} diupdate!`);
             document.getElementById(`${type}Form`).reset();
         } catch (err) {
             console.error(err);
-            showToast('❌ Gagal update (Cek Koneksi/Rules)');
+            showToast('❌ Gagal (Cek Koneksi/Rules)');
         } finally {
             btn.disabled = false; btn.textContent = `💾 Update Stok ${type}`;
         }
@@ -496,7 +509,6 @@
     document.getElementById('dapurForm').addEventListener('submit', (e) => handleStockSubmit(e, 'dapur'));
     document.getElementById('barForm').addEventListener('submit', (e) => handleStockSubmit(e, 'bar'));
 
-    // Load & Render Inventory
     function loadInventory(collName, listId, datalistId) {
         const q = query(getColRef(collName), orderBy("name"));
         onSnapshot(q, (snapshot) => {
@@ -504,11 +516,10 @@
             const datalist = document.getElementById(datalistId);
             const items = snapshot.docs.map(d => d.data());
 
-            // Auto-complete options
             datalist.innerHTML = items.map(i => `<option value="${i.name}">`).join('');
 
             if (items.length === 0) {
-                container.innerHTML = '<div class="empty-state">Stok masih kosong</div>';
+                container.innerHTML = '<div class="empty-state">Stok kosong</div>';
                 return;
             }
 
@@ -524,15 +535,12 @@
         });
     }
 
-    // 6. Utilities
     window.quickFill = (type, item) => {
         document.getElementById(`${type}-item`).value = item;
         document.getElementById(`${type}-qty`).focus();
     };
 
-    function formatRupiah(num) {
-        return 'Rp ' + (num || 0).toLocaleString('id-ID');
-    }
+    function formatRupiah(num) { return 'Rp ' + (num || 0).toLocaleString('id-ID'); }
 
     function showToast(msg) {
         const t = document.getElementById('toast');
@@ -540,7 +548,6 @@
         setTimeout(() => t.classList.remove('show'), 3000);
     }
 
-    // Tab Switching logic
     document.querySelectorAll('.tab-btn').forEach(btn => {
         btn.addEventListener('click', () => {
             document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
