@@ -43,6 +43,11 @@
     .toast { position: fixed; bottom: 24px; right: 24px; background: #1e293b; color: white; padding: 14px 24px; border-radius: 10px; display: none; z-index: 50; }
     .toast.show { display: block; animation: slideUp 0.3s; }
     @keyframes slideUp { from { transform: translateY(20px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
+
+    /* New Service Grid */
+    .service-card { background: #f8fafc; border: 1px solid #e2e8f0; padding: 10px; border-radius: 10px; margin-bottom: 10px; }
+    .service-label { font-weight: 800; font-size: 13px; color: #4f46e5; margin-bottom: 8px; display: block; }
+    .sub-label { font-size: 10px; color: #94a3b8; font-weight: 700; margin-bottom: 2px; }
   </style>
  </head>
  <body>
@@ -76,37 +81,61 @@
        </div>
       </div>
 
-      <!-- Pendapatan F&B -->
+      <!-- A. PENDAPATAN F&B -->
       <div class="section-title">A. Pendapatan F&B (Utama)</div>
       <div class="grid grid-cols-2 gap-3">
        <div class="form-group">
         <label>Penjualan QRIS</label>
-        <input type="number" id="penjualan-qris" class="input-field" placeholder="0">
+        <input type="number" id="penjualan-qris" class="input-field bg-slate-50" placeholder="0">
        </div>
        <div class="form-group">
         <label>Penjualan Tunai</label>
-        <input type="number" id="penjualan-cash" class="input-field" placeholder="0">
+        <input type="number" id="penjualan-cash" class="input-field bg-slate-50" placeholder="0">
        </div>
       </div>
 
-      <!-- Pendapatan Jasa Lain -->
-      <div class="section-title">B. Pendapatan Jasa Lain (Tunai)</div>
-      <div class="grid grid-cols-3 gap-2">
-       <div class="form-group">
-        <label>Karaoke</label>
-        <input type="number" id="inc-karaoke" class="input-field text-sm" placeholder="Rp">
-       </div>
-       <div class="form-group">
-        <label>Kursi Pijat</label>
-        <input type="number" id="inc-massage" class="input-field text-sm" placeholder="Rp">
-       </div>
-       <div class="form-group">
-        <label>Hipnoterapi</label>
-        <input type="number" id="inc-hypno" class="input-field text-sm" placeholder="Rp">
-       </div>
+      <!-- B. PENDAPATAN JASA LAIN -->
+      <div class="section-title">B. Pendapatan Jasa Lain (Non-F&B)</div>
+      
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
+          <!-- Karaoke -->
+          <div class="service-card">
+              <span class="service-label">🎤 Karaoke</span>
+              <div class="grid grid-cols-2 gap-2">
+                  <div><label class="sub-label">Tunai</label><input type="number" id="kar-cash" class="input-field text-sm" placeholder="0"></div>
+                  <div><label class="sub-label">QRIS</label><input type="number" id="kar-qris" class="input-field text-sm" placeholder="0"></div>
+              </div>
+          </div>
+
+          <!-- Billiard -->
+          <div class="service-card">
+              <span class="service-label">🎱 Billiard</span>
+              <div class="grid grid-cols-2 gap-2">
+                  <div><label class="sub-label">Tunai</label><input type="number" id="bil-cash" class="input-field text-sm" placeholder="0"></div>
+                  <div><label class="sub-label">QRIS</label><input type="number" id="bil-qris" class="input-field text-sm" placeholder="0"></div>
+              </div>
+          </div>
+
+          <!-- Hipnoterapi -->
+          <div class="service-card">
+              <span class="service-label">🧠 Hipnoterapi</span>
+              <div class="grid grid-cols-2 gap-2">
+                  <div><label class="sub-label">Tunai</label><input type="number" id="hyp-cash" class="input-field text-sm" placeholder="0"></div>
+                  <div><label class="sub-label">QRIS</label><input type="number" id="hyp-qris" class="input-field text-sm" placeholder="0"></div>
+              </div>
+          </div>
+
+          <!-- Kursi Pijat -->
+          <div class="service-card">
+              <span class="service-label">💆 Kursi Pijat</span>
+              <div class="grid grid-cols-2 gap-2">
+                  <div><label class="sub-label">Tunai</label><input type="number" id="mas-cash" class="input-field text-sm" placeholder="0"></div>
+                  <div><label class="sub-label">QRIS</label><input type="number" id="mas-qris" class="input-field text-sm" placeholder="0"></div>
+              </div>
+          </div>
       </div>
 
-      <!-- Pengeluaran Operasional -->
+      <!-- C. PENGELUARAN -->
       <div class="section-title text-rose-600 border-rose-100">C. Pengeluaran Operasional (Cash Out)</div>
       <div class="bg-rose-50 p-3 rounded-lg border border-rose-100 mb-4">
         <div class="grid grid-cols-1 gap-2 mb-2">
@@ -125,8 +154,6 @@
             </div>
         </div>
         <button type="button" onclick="addExpense()" class="w-full bg-rose-600 text-white py-2 rounded-lg font-bold text-sm hover:bg-rose-700">+ Tambah Item</button>
-        
-        <!-- List Item -->
         <div id="expense-list-container" class="expense-list hidden"></div>
         <input type="hidden" id="total-expenses" value="0">
       </div>
@@ -134,8 +161,7 @@
       <!-- Kalkulator -->
       <div class="calculator-box">
        <div class="calc-row"><span>Modal Awal</span> <strong id="calc-modal">Rp 0</strong></div>
-       <div class="calc-row"><span>F&B Tunai</span> <strong id="calc-fnb">Rp 0</strong></div>
-       <div class="calc-row"><span>Jasa Lain (Karaoke dll)</span> <strong id="calc-services">Rp 0</strong></div>
+       <div class="calc-row"><span>Total Tunai Masuk (F&B + Jasa)</span> <strong id="calc-total-in">Rp 0</strong></div>
        <div class="calc-row text-rose-600"><span>Total Pengeluaran</span> <strong id="calc-exp">- Rp 0</strong></div>
        <div class="calc-row total"><span>Uang Fisik Seharusnya</span> <strong id="calc-total">Rp 0</strong></div>
       </div>
@@ -239,8 +265,8 @@
         { name: "Fitri Ainur Sabita", role: "Chef" }, { name: "Shada Amalia", role: "Chef" },
         { name: "Ovy Putri Novia", role: "Chef" }, { name: "Jihan Permata Sari", role: "Kasir" },
         { name: "Samlawi", role: "Bartender" }, { name: "Iqbal Arasyid", role: "Chef" },
-        { name: "Ansyari Fachmi Ridhani", role: "Bartender" },{ name: "Farah Asyifa ", role: "Kasir" }, { name: "Nahjatus Sabela", role: "Kasir" },
-        { name: "Alif Junifa", role: "Chef" }
+        { name: "Ansyari Fachmi Ridhani", role: "Bartender" }, { name: "Farah Asyifa ", role: "Kasir" },
+        { name: "Nahjatus Sabela", role: "Kasir" }, { name: "Alif Junifa", role: "Chef" }
     ];
 
     let expenseList = [];
@@ -269,21 +295,23 @@
         fill('bar-staff', 'Bartender');
     }
 
-    // --- LOGIC SHIFT & DATE ---
+    // --- LOGIC SHIFT ---
     function getShift() {
         const h = new Date().getHours();
         const badge = document.getElementById('current-shift-badge');
-        let s = 'Pagi', c = 'bg-yellow-100 text-yellow-800';
-        if(h >= 16 && h < 23) { s = 'Siang'; c = 'bg-blue-100 text-blue-800'; }
-        else if(h >= 23 || h < 8) { s = 'Malam'; c = 'bg-purple-100 text-purple-800'; }
-        if(badge) badge.innerHTML = `<span class="px-3 py-1 rounded-full text-xs font-bold ${c}">Shift ${s} Aktif</span>`;
+        let s = '', c = '';
+        if (h >= 0 && h < 8) { s = 'Pagi'; c = 'bg-yellow-100 text-yellow-800'; }
+        else if (h >= 8 && h < 16) { s = 'Siang'; c = 'bg-emerald-100 text-emerald-800'; }
+        else { s = 'Malam'; c = 'bg-purple-100 text-purple-800'; }
+        
+        if(badge) badge.innerHTML = `<span class="px-3 py-1 rounded-full text-xs font-bold ${c}">Shift ${s} Aktif (${h}:00)</span>`;
         return s;
     }
     getShift(); setInterval(getShift, 60000);
 
     function getOpDate() {
         const d = new Date();
-        if(d.getHours() < 8) d.setDate(d.getDate() - 1);
+        // Shift Pagi (00-08) tetap dihitung hari ini (Tidak mundur hari)
         return d.toLocaleDateString('id-ID');
     }
 
@@ -295,7 +323,6 @@
         
         if(!catEl.value || !desc || amt <= 0) { showToast('Lengkapi data pengeluaran!'); return; }
         
-        // Simpan COA code dan nama kategori
         const catName = catEl.options[catEl.selectedIndex].text;
         expenseList.push({ categoryCode: catEl.value, categoryName: catName, desc, amount: amt });
         
@@ -326,25 +353,28 @@
         const modal = parseInt(document.getElementById('modal-awal').value) || 0;
         const fnbCash = parseInt(document.getElementById('penjualan-cash').value) || 0;
         
-        // Pendapatan Lain (Cash In)
-        const incKar = parseInt(document.getElementById('inc-karaoke').value) || 0;
-        const incMas = parseInt(document.getElementById('inc-massage').value) || 0;
-        const incHyp = parseInt(document.getElementById('inc-hypno').value) || 0;
-        const totalServices = incKar + incMas + incHyp;
-
+        // JASA LAIN (TUNAI ONLY yang dihitung ke fisik)
+        const karCash = parseInt(document.getElementById('kar-cash').value) || 0;
+        const bilCash = parseInt(document.getElementById('bil-cash').value) || 0;
+        const hypCash = parseInt(document.getElementById('hyp-cash').value) || 0;
+        const masCash = parseInt(document.getElementById('mas-cash').value) || 0;
+        
+        const totalServiceCash = karCash + bilCash + hypCash + masCash;
         const exp = parseInt(document.getElementById('total-expenses').value) || 0;
-        const total = modal + fnbCash + totalServices - exp;
+        
+        // Rumus: Modal + F&B Tunai + Jasa Tunai - Pengeluaran
+        const total = modal + fnbCash + totalServiceCash - exp;
 
         document.getElementById('calc-modal').innerText = fmt(modal);
         document.getElementById('calc-fnb').innerText = fmt(fnbCash);
-        document.getElementById('calc-services').innerText = fmt(totalServices);
+        document.getElementById('calc-services').innerText = fmt(totalServiceCash);
         document.getElementById('calc-exp').innerText = "- " + fmt(exp);
         document.getElementById('calc-total').innerText = fmt(total);
     }
 
-    ['modal-awal', 'penjualan-cash', 'inc-karaoke', 'inc-massage', 'inc-hypno'].forEach(id => {
-        document.getElementById(id).addEventListener('input', calc);
-    });
+    // Attach listeners to all inputs
+    const ids = ['modal-awal', 'penjualan-cash', 'kar-cash', 'bil-cash', 'hyp-cash', 'mas-cash'];
+    ids.forEach(id => document.getElementById(id)?.addEventListener('input', calc));
 
     // --- SUBMIT SHIFT ---
     document.getElementById('kasForm').addEventListener('submit', async (e) => {
@@ -354,35 +384,56 @@
 
         try {
             const modal = parseInt(document.getElementById('modal-awal').value) || 0;
-            const cash = parseInt(document.getElementById('penjualan-cash').value) || 0;
-            const qris = parseInt(document.getElementById('penjualan-qris').value) || 0;
             
-            // Extra Incomes
-            const incKar = parseInt(document.getElementById('inc-karaoke').value) || 0;
-            const incMas = parseInt(document.getElementById('inc-massage').value) || 0;
-            const incHyp = parseInt(document.getElementById('inc-hypno').value) || 0;
+            // F&B
+            const fnbCash = parseInt(document.getElementById('penjualan-cash').value) || 0;
+            const fnbQris = parseInt(document.getElementById('penjualan-qris').value) || 0;
+
+            // Services
+            const karCash = parseInt(document.getElementById('kar-cash').value) || 0;
+            const karQris = parseInt(document.getElementById('kar-qris').value) || 0;
             
+            const bilCash = parseInt(document.getElementById('bil-cash').value) || 0;
+            const bilQris = parseInt(document.getElementById('bil-qris').value) || 0;
+            
+            const hypCash = parseInt(document.getElementById('hyp-cash').value) || 0;
+            const hypQris = parseInt(document.getElementById('hyp-qris').value) || 0;
+            
+            const masCash = parseInt(document.getElementById('mas-cash').value) || 0;
+            const masQris = parseInt(document.getElementById('mas-qris').value) || 0;
+
+            // Totals
+            const totalCashIn = fnbCash + karCash + bilCash + hypCash + masCash;
+            const totalQrisIn = fnbQris + karQris + bilQris + hypQris + masQris;
             const exp = parseInt(document.getElementById('total-expenses').value) || 0;
             const fisik = parseInt(document.getElementById('fisik-laci').value) || 0;
-            const expected = modal + cash + incKar + incMas + incHyp - exp;
+            const expected = modal + totalCashIn - exp;
 
             await addDoc(getColRef('shift_reports'), {
                 staffName: document.getElementById('kas-staff').value,
                 shift: getShift(),
                 date: getOpDate(),
                 realDate: new Date().toISOString(),
-                // Financial Data
+                
+                // Financial Data (Aggregated for Manager)
                 startCash: modal,
-                cashSales: cash,
-                qrisSales: qris,
-                // New Income Fields
-                incomeKaraoke: incKar,
-                incomeMassage: incMas,
-                incomeHypno: incHyp,
-                // Expenses
+                cashSales: totalCashIn,
+                qrisSales: totalQrisIn,
+                
+                // Detail Services Income
+                incomeFnbCash: fnbCash, incomeFnbQris: fnbQris,
+                incomeKaraokeCash: karCash, incomeKaraokeQris: karQris,
+                incomeBilliardCash: bilCash, incomeBilliardQris: bilQris,
+                incomeHypnoCash: hypCash, incomeHypnoQris: hypQris,
+                incomeMassageCash: masCash, incomeMassageQris: masQris,
+
+                // Legacy Fields for Backward Compatibility
+                incomeKaraoke: karCash + karQris,
+                incomeMassage: masCash + masQris,
+                incomeHypno: hypCash + hypQris,
+
                 expenses: exp,
-                expenseDetails: expenseList, // Array with COA codes
-                // Balance
+                expenseDetails: expenseList,
                 expectedCash: expected,
                 physicalCash: fisik,
                 difference: fisik - expected,
@@ -393,10 +444,10 @@
 
             showToast('Laporan Shift Tersimpan!');
             setTimeout(() => location.reload(), 1500);
-        } catch(err) { console.error(err); showToast('Gagal menyimpan'); btn.disabled = false; }
+        } catch(err) { console.error(err); showToast('Gagal menyimpan: ' + err.message); btn.disabled = false; }
     });
 
-    // --- HISTORY (With Error Handling) ---
+    // --- HISTORY ---
     function loadHistory() {
         try {
             const q = query(getColRef("shift_reports"), orderBy("createdAt", "desc"));
@@ -420,14 +471,13 @@
                     </div>
                 `).join('');
             }, (error) => {
-                // Graceful error handling for missing permissions
-                console.warn("History access denied:", error.message);
-                document.getElementById('kas-history').innerHTML = '<div class="text-center text-red-400 text-xs py-2">Data Riwayat tidak dapat dimuat (Izin Ditolak)</div>';
+                console.warn("History denied:", error.message);
+                document.getElementById('kas-history').innerHTML = '<div class="text-center text-red-400 text-xs py-2">Gagal memuat riwayat (Cek Rules)</div>';
             });
         } catch(e){}
     }
 
-    // --- INVENTORY (With Error Handling) ---
+    // --- INVENTORY ---
     const handleStock = async (e, type) => {
         e.preventDefault();
         const coll = type === 'dapur' ? 'inventory_kitchen' : 'inventory_bar';
@@ -452,7 +502,7 @@
             }
             showToast('Stok Diupdate!');
             document.getElementById(`${type}Form`).reset();
-        } catch(e) { showToast('Gagal update: ' + e.message); }
+        } catch(e) { showToast('Gagal update'); }
         finally { btn.disabled = false; btn.innerText = 'Update Stok'; }
     };
     document.getElementById('dapurForm').addEventListener('submit', e => handleStock(e, 'dapur'));
@@ -472,8 +522,8 @@
                 </div>
             `).join('');
         }, (error) => {
-             console.warn("Stock access denied:", error.message);
-             document.getElementById(listId).innerHTML = '<div class="col-span-2 text-center text-red-400 text-xs">Gagal memuat stok (Izin Ditolak)</div>';
+            console.warn("Stock denied:", error.message);
+            document.getElementById(listId).innerHTML = '<div class="col-span-2 text-center text-red-400 text-xs">Gagal memuat stok</div>';
         });
     }
 
