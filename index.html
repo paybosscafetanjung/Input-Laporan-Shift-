@@ -3,121 +3,54 @@
  <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Staff Operations - PayBoss Connected</title>
+  <title>Staff Ops - COA Integrated</title>
   <script src="https://cdn.tailwindcss.com"></script>
   <style>
-    body {
-      box-sizing: border-box; margin: 0; padding: 0;
-      font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
-      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-      min-height: 100vh; width: 100%;
-    }
+    body { font-family: 'Inter', sans-serif; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); min-height: 100vh; }
     * { box-sizing: border-box; }
-
-    .staff-container { width: 100%; min-height: 100%; padding: 20px; max-width: 800px; margin: 0 auto; }
-
-    .header {
-      background: white; padding: 24px; border-radius: 16px;
-      box-shadow: 0 4px 20px rgba(0,0,0,0.1); margin-bottom: 20px;
-    }
-    .header h1 { margin: 0 0 8px 0; color: #1a202c; font-size: 28px; font-weight: 700; }
-    .header p { margin: 0; color: #718096; font-size: 14px; }
-
-    .tabs { display: flex; gap: 12px; margin-bottom: 20px; flex-wrap: wrap; }
-    .tab-btn {
-      flex: 1; min-width: 120px; padding: 16px 24px; background: white; border: none;
-      border-radius: 12px; cursor: pointer; font-size: 15px; font-weight: 600; color: #4a5568;
-      box-shadow: 0 2px 10px rgba(0,0,0,0.08); transition: all 0.3s ease;
-    }
-    .tab-btn:hover { transform: translateY(-2px); box-shadow: 0 4px 15px rgba(0,0,0,0.12); }
-    .tab-btn.active { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; }
-
-    .tab-content { display: none; animation: fadeIn 0.4s ease; }
+    .staff-container { width: 100%; padding: 20px; max-width: 800px; margin: 0 auto; }
+    .header { background: white; padding: 24px; border-radius: 16px; box-shadow: 0 4px 20px rgba(0,0,0,0.1); margin-bottom: 20px; }
+    .header h1 { margin: 0 0 8px 0; color: #1a202c; font-size: 24px; font-weight: 700; }
+    .tabs { display: flex; gap: 8px; margin-bottom: 20px; flex-wrap: wrap; }
+    .tab-btn { flex: 1; min-width: 100px; padding: 12px; background: white; border-radius: 10px; font-weight: 600; color: #4a5568; transition: all 0.2s; }
+    .tab-btn.active { background: #34d399; color: white; box-shadow: 0 4px 10px rgba(52, 211, 153, 0.3); }
+    .tab-content { display: none; animation: fadeIn 0.3s ease; }
     .tab-content.active { display: block; }
-    @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+    @keyframes fadeIn { from { opacity: 0; transform: translateY(5px); } to { opacity: 1; transform: translateY(0); } }
+    
+    .form-card { background: white; padding: 20px; border-radius: 16px; box-shadow: 0 4px 10px rgba(0,0,0,0.05); margin-bottom: 20px; }
+    .form-group { margin-bottom: 12px; }
+    .form-group label { display: block; font-size: 12px; font-weight: 700; color: #64748b; margin-bottom: 4px; text-transform: uppercase; }
+    .input-field { width: 100%; padding: 12px; border: 2px solid #e2e8f0; border-radius: 10px; font-weight: 600; font-size: 15px; outline: none; transition: border 0.2s; }
+    .input-field:focus { border-color: #667eea; }
+    
+    /* Section Headers */
+    .section-title { font-size: 14px; font-weight: 800; color: #334155; border-bottom: 2px solid #f1f5f9; padding-bottom: 8px; margin-bottom: 12px; margin-top: 16px; }
 
-    .form-card {
-      background: white; padding: 24px; border-radius: 16px;
-      box-shadow: 0 4px 20px rgba(0,0,0,0.1); margin-bottom: 20px;
-    }
-    .form-card h2 { margin: 0 0 20px 0; color: #2d3748; font-size: 20px; font-weight: 700; display: flex; align-items: center; gap: 8px; }
+    /* Calculator */
+    .calculator-box { background: #f8fafc; padding: 16px; border-radius: 12px; border-left: 4px solid #667eea; margin: 20px 0; }
+    .calc-row { display: flex; justify-content: space-between; font-size: 13px; color: #64748b; margin-bottom: 6px; }
+    .calc-row.total { font-size: 16px; font-weight: 800; color: #1e293b; border-top: 2px dashed #cbd5e0; padding-top: 10px; margin-top: 8px; }
 
-    .form-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 16px; margin-bottom: 16px; }
-    .form-group { display: flex; flex-direction: column; }
-    .form-group label { margin-bottom: 8px; color: #4a5568; font-weight: 600; font-size: 13px; text-transform: uppercase; letter-spacing: 0.5px; }
-    .form-group input, .form-group select, .form-group textarea {
-      padding: 12px; border: 2px solid #e2e8f0; border-radius: 10px; font-size: 15px; transition: border-color 0.3s ease; width: 100%;
-    }
-    .form-group input:focus, .form-group select:focus { outline: none; border-color: #667eea; }
+    /* Expense List */
+    .expense-list { margin-top: 10px; background: #fff1f2; border-radius: 8px; overflow: hidden; border: 1px solid #fecdd3; }
+    .expense-item { display: flex; justify-content: space-between; padding: 10px; border-bottom: 1px solid #fecdd3; font-size: 13px; color: #be123c; }
+    
+    .submit-btn { width: 100%; padding: 16px; background: #10b981; color: white; border-radius: 12px; font-weight: 700; margin-top: 10px; transition: transform 0.2s; }
+    .submit-btn:hover { transform: translateY(-2px); background: #059669; }
+    .submit-btn:disabled { background: #cbd5e0; transform: none; }
 
-    .shift-badge { display: inline-block; padding: 6px 12px; border-radius: 20px; font-size: 13px; font-weight: 700; margin-bottom: 16px; }
-    .shift-pagi { background: #fef3c7; color: #92400e; }
-    .shift-siang { background: #dbeafe; color: #1e3a8a; }
-    .shift-malam { background: #ede9fe; color: #5b21b6; }
-
-    .calculator-box {
-      background: #f8fafc; padding: 20px; border-radius: 12px; margin: 20px 0;
-      border-left: 5px solid #667eea; box-shadow: inset 0 2px 4px rgba(0,0,0,0.02);
-    }
-    .calc-row { display: flex; justify-content: space-between; align-items: center; padding: 8px 0; font-size: 14px; color: #64748b; }
-    .calc-row.total {
-      border-top: 2px dashed #cbd5e0; margin-top: 12px; padding-top: 16px;
-      font-size: 18px; font-weight: 700; color: #1e293b;
-    }
-
-    .submit-btn {
-      width: 100%; padding: 16px; background: linear-gradient(135deg, #48bb78 0%, #38a169 100%);
-      color: white; border: none; border-radius: 12px; font-size: 16px; font-weight: 700;
-      cursor: pointer; transition: all 0.3s ease; margin-top: 16px;
-      box-shadow: 0 4px 12px rgba(72, 187, 120, 0.3);
-    }
-    .submit-btn:hover { transform: translateY(-2px); filter: brightness(1.05); }
-    .submit-btn:active { transform: translateY(0); }
-    .submit-btn:disabled { background: #cbd5e0; cursor: not-allowed; transform: none; box-shadow: none; }
-
-    .stock-list { display: grid; grid-template-columns: repeat(auto-fill, minmax(140px, 1fr)); gap: 12px; margin-top: 20px; }
-    .stock-item-card {
-      background: #f8fafc; padding: 16px; border-radius: 12px; border: 1px solid #e2e8f0;
-      transition: all 0.3s ease; text-align: center;
-    }
-    .stock-item-card:hover { border-color: #667eea; transform: translateY(-3px); box-shadow: 0 4px 12px rgba(0,0,0,0.05); }
-    .stock-item-name { font-weight: 600; color: #334155; font-size: 14px; margin-bottom: 4px; }
-    .stock-item-qty { font-size: 24px; font-weight: 800; color: #667eea; }
-    .stock-item-info { font-size: 11px; color: #94a3b8; margin-top: 8px; }
-
-    .quick-add-buttons { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 16px; }
-    .quick-add-btn {
-      padding: 8px 16px; background: #edf2f7; border: 1px solid #cbd5e0; border-radius: 20px;
-      cursor: pointer; font-size: 12px; font-weight: 600; color: #4a5568; transition: all 0.2s;
-    }
-    .quick-add-btn:hover { background: #667eea; color: white; border-color: #667eea; }
-
-    .history-section { background: white; padding: 24px; border-radius: 16px; margin-top: 20px; }
-    .history-section h3 { margin: 0 0 16px 0; color: #2d3748; font-size: 18px; font-weight: 700; }
-    .history-list { display: flex; flex-direction: column; gap: 12px; max-height: 300px; overflow-y: auto; }
-    .history-item {
-      padding: 12px; background: #f8fafc; border-radius: 8px; border-left: 4px solid #667eea;
-      font-size: 13px; color: #475569; display: flex; justify-content: space-between; align-items: center;
-    }
-
-    .toast {
-      position: fixed; bottom: 24px; right: 24px; background: #1e293b; color: white;
-      padding: 14px 24px; border-radius: 10px; box-shadow: 0 10px 30px rgba(0,0,0,0.2);
-      display: none; z-index: 2000; font-weight: 600; font-size: 14px;
-      animation: slideUp 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-    }
-    .toast.show { display: block; }
-    @keyframes slideUp { from { transform: translateY(50px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
-
-    .empty-state { text-align: center; color: #94a3b8; padding: 20px; font-size: 14px; font-style: italic; }
+    .toast { position: fixed; bottom: 24px; right: 24px; background: #1e293b; color: white; padding: 14px 24px; border-radius: 10px; display: none; z-index: 50; }
+    .toast.show { display: block; animation: slideUp 0.3s; }
+    @keyframes slideUp { from { transform: translateY(20px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
   </style>
  </head>
  <body>
 
   <div class="staff-container">
    <header class="header">
-    <h1>👨‍🍳 Staff Operations</h1>
-    <p>Portal Operasional Harian PayBoss Cafe</p>
+    <h1>👨‍🍳 PayBoss Staff Ops</h1>
+    <p class="text-sm text-gray-500">Input Data Terintegrasi (COA Ready)</p>
    </header>
 
    <div class="tabs">
@@ -126,177 +59,157 @@
     <button class="tab-btn" data-tab="bar">🍷 Stok Bar</button>
    </div>
 
-   <!-- Tab Kas & Shift -->
+   <!-- 1. KAS & SHIFT -->
    <div class="tab-content active" id="kas-tab">
     <div class="form-card">
-     <h2>💵 Input Laporan Shift</h2>
-     <div id="current-shift-badge"></div>
+     <div id="current-shift-badge" class="mb-4"></div>
      
      <form id="kasForm">
-      <div class="form-grid">
-       <div class="form-group">
-        <label for="kas-staff">Nama Staff (Kasir) *</label>
-        <select id="kas-staff" required>
-         <option value="">-- Pilih Nama --</option>
-         <!-- Populated by JS -->
-        </select>
+      <div class="grid grid-cols-2 gap-3">
+       <div class="form-group col-span-2">
+        <label>Nama Staff (Kasir)</label>
+        <select id="kas-staff" class="input-field" required><option value="">-- Pilih Nama --</option></select>
        </div>
-       <div class="form-group">
-        <label for="modal-awal">Modal Awal (Rp) *</label>
-        <input type="number" id="modal-awal" min="0" required placeholder="0">
-       </div>
-       <div class="form-group">
-        <label for="penjualan-qris">Penjualan QRIS (Rp)</label>
-        <input type="number" id="penjualan-qris" min="0" value="0" placeholder="0">
-       </div>
-       <div class="form-group">
-        <label for="penjualan-cash">Penjualan Cash (Rp)</label>
-        <input type="number" id="penjualan-cash" min="0" value="0" placeholder="0">
-       </div>
-       <div class="form-group">
-        <label for="bon-keluar">Bon/Uang Keluar (Rp)</label>
-        <input type="number" id="bon-keluar" min="0" value="0" placeholder="0">
-       </div>
-       <div class="form-group">
-        <label for="bon-desc">Keterangan Bon</label>
-        <input type="text" id="bon-desc" placeholder="Contoh: Beli Gas, Es Batu">
+       <div class="form-group col-span-2">
+        <label>Modal Awal (Rp)</label>
+        <input type="number" id="modal-awal" class="input-field" placeholder="0" required>
        </div>
       </div>
 
+      <!-- Pendapatan F&B -->
+      <div class="section-title">A. Pendapatan F&B (Utama)</div>
+      <div class="grid grid-cols-2 gap-3">
+       <div class="form-group">
+        <label>Penjualan QRIS</label>
+        <input type="number" id="penjualan-qris" class="input-field" placeholder="0">
+       </div>
+       <div class="form-group">
+        <label>Penjualan Tunai</label>
+        <input type="number" id="penjualan-cash" class="input-field" placeholder="0">
+       </div>
+      </div>
+
+      <!-- Pendapatan Jasa Lain -->
+      <div class="section-title">B. Pendapatan Jasa Lain (Tunai)</div>
+      <div class="grid grid-cols-3 gap-2">
+       <div class="form-group">
+        <label>Karaoke</label>
+        <input type="number" id="inc-karaoke" class="input-field text-sm" placeholder="Rp">
+       </div>
+       <div class="form-group">
+        <label>Kursi Pijat</label>
+        <input type="number" id="inc-massage" class="input-field text-sm" placeholder="Rp">
+       </div>
+       <div class="form-group">
+        <label>Hipnoterapi</label>
+        <input type="number" id="inc-hypno" class="input-field text-sm" placeholder="Rp">
+       </div>
+      </div>
+
+      <!-- Pengeluaran Operasional -->
+      <div class="section-title text-rose-600 border-rose-100">C. Pengeluaran Operasional (Cash Out)</div>
+      <div class="bg-rose-50 p-3 rounded-lg border border-rose-100 mb-4">
+        <div class="grid grid-cols-1 gap-2 mb-2">
+            <select id="exp-category" class="input-field text-sm bg-white">
+                <option value="">-- Pilih Kategori Pengeluaran --</option>
+                <option value="5101">🛒 Bahan Baku (Es/Galon/Sayur)</option>
+                <option value="5302">🔥 Gas & Air</option>
+                <option value="5304">🧹 Kebersihan (Sabun/Tisu)</option>
+                <option value="5404">🛵 Transport / Bensin</option>
+                <option value="prive">💼 Setor ke Owner/Bos (Prive)</option>
+                <option value="lain">📝 Lain-lain</option>
+            </select>
+            <div class="flex gap-2">
+                <input type="text" id="exp-desc" class="input-field text-sm" placeholder="Keterangan (Wajib)" style="flex:2">
+                <input type="number" id="exp-amt" class="input-field text-sm" placeholder="Rp" style="flex:1">
+            </div>
+        </div>
+        <button type="button" onclick="addExpense()" class="w-full bg-rose-600 text-white py-2 rounded-lg font-bold text-sm hover:bg-rose-700">+ Tambah Item</button>
+        
+        <!-- List Item -->
+        <div id="expense-list-container" class="expense-list hidden"></div>
+        <input type="hidden" id="total-expenses" value="0">
+      </div>
+
+      <!-- Kalkulator -->
       <div class="calculator-box">
-       <div class="calc-row"><span>Modal Awal:</span> <strong id="calc-modal">Rp 0</strong></div>
-       <div class="calc-row"><span>Penjualan Cash:</span> <strong id="calc-cash">Rp 0</strong></div>
-       <div class="calc-row"><span>Bon Keluar:</span> <strong id="calc-bon" style="color: #ef4444;">- Rp 0</strong></div>
-       <div class="calc-row total"><span>Uang Fisik Seharusnya:</span> <strong id="calc-total" style="color: #667eea;">Rp 0</strong></div>
+       <div class="calc-row"><span>Modal Awal</span> <strong id="calc-modal">Rp 0</strong></div>
+       <div class="calc-row"><span>F&B Tunai</span> <strong id="calc-fnb">Rp 0</strong></div>
+       <div class="calc-row"><span>Jasa Lain (Karaoke dll)</span> <strong id="calc-services">Rp 0</strong></div>
+       <div class="calc-row text-rose-600"><span>Total Pengeluaran</span> <strong id="calc-exp">- Rp 0</strong></div>
+       <div class="calc-row total"><span>Uang Fisik Seharusnya</span> <strong id="calc-total">Rp 0</strong></div>
       </div>
 
+      <!-- Fisik -->
       <div class="form-group">
-          <label for="fisik-laci" style="color: #1e3a8a;">Hitung Fisik Uang di Laci (Wajib) *</label>
-          <input type="number" id="fisik-laci" style="border: 2px solid #1e3a8a; background: #eff6ff;" required placeholder="Total uang tunai di laci">
+          <label class="text-emerald-700">Hitung Uang Fisik Di Laci (Wajib)</label>
+          <input type="number" id="fisik-laci" class="input-field border-emerald-500 bg-emerald-50 text-lg font-bold" required placeholder="0">
       </div>
 
-      <div class="form-group" style="margin-top: 12px;">
-        <label for="shift-notes">Catatan (Opsional)</label>
-        <textarea id="shift-notes" rows="2" placeholder="Ada selisih uang? Jelaskan di sini..."></textarea>
+      <div class="form-group mt-3">
+        <label>Catatan Shift</label>
+        <textarea id="shift-notes" rows="2" class="input-field text-sm" placeholder="Ada selisih? Catat di sini..."></textarea>
       </div>
 
-      <button type="submit" class="submit-btn" id="kas-submit-btn">💾 Simpan Laporan</button>
+      <button type="submit" id="kas-submit-btn" class="submit-btn">💾 Simpan Laporan Shift</button>
      </form>
     </div>
 
-    <div class="history-section">
-     <h3>📊 Riwayat Shift Hari Ini</h3>
-     <div class="history-list" id="kas-history">
-      <div class="empty-state">Memuat data...</div>
-     </div>
+    <!-- History -->
+    <div class="bg-white p-4 rounded-xl shadow-sm">
+        <h3 class="font-bold text-slate-700 mb-2">Riwayat Hari Ini</h3>
+        <div id="kas-history" class="space-y-2 text-sm text-slate-500 text-center italic">Memuat data...</div>
     </div>
    </div>
 
-   <!-- Tab Stok Dapur -->
+   <!-- 2. STOK DAPUR -->
    <div class="tab-content" id="dapur-tab">
     <div class="form-card">
-     <h2>📦 Update Stok Dapur</h2>
+     <div class="section-title">Update Stok Dapur</div>
      <form id="dapurForm">
-      <div class="form-grid">
-       <div class="form-group">
-        <label for="dapur-staff">Nama Staff (Chef/Koki) *</label>
-        <select id="dapur-staff" required>
-         <option value="">-- Pilih Nama --</option>
-         <!-- Populated by JS -->
-        </select>
-       </div>
-       <div class="form-group">
-        <label for="dapur-item">Nama Barang *</label>
-        <input type="text" id="dapur-item" list="dapur-items" required placeholder="Ketik atau pilih...">
-        <datalist id="dapur-items"></datalist>
-       </div>
-       <div class="form-group">
-        <label for="dapur-qty">Jumlah *</label>
-        <input type="number" id="dapur-qty" min="1" required placeholder="0">
-       </div>
-       <div class="form-group">
-        <label for="dapur-movement">Aksi *</label>
-        <select id="dapur-movement" required>
-         <option value="masuk">➕ Barang Masuk (Beli/Datang)</option>
-         <option value="keluar">➖ Barang Keluar (Dipakai/Rusak)</option>
-        </select>
-       </div>
+      <div class="form-group"><label>Chef/Koki</label><select id="dapur-staff" class="input-field" required><option value="">-- Pilih --</option></select></div>
+      <div class="form-group"><label>Barang</label><input type="text" id="dapur-item" list="dapur-items" class="input-field" required><datalist id="dapur-items"></datalist></div>
+      <div class="flex gap-2">
+          <div class="form-group flex-1"><label>Jumlah</label><input type="number" id="dapur-qty" class="input-field" required></div>
+          <div class="form-group flex-1"><label>Aksi</label><select id="dapur-movement" class="input-field" required><option value="masuk">Masuk (+)</option><option value="keluar">Keluar (-)</option></select></div>
       </div>
-      
-      <div class="quick-add-buttons">
-        <button type="button" class="quick-add-btn" onclick="quickFill('dapur', 'Beras')">Beras</button>
-        <button type="button" class="quick-add-btn" onclick="quickFill('dapur', 'Minyak Goreng')">Minyak</button>
-        <button type="button" class="quick-add-btn" onclick="quickFill('dapur', 'Telur')">Telur</button>
-        <button type="button" class="quick-add-btn" onclick="quickFill('dapur', 'Ayam')">Ayam</button>
-        <button type="button" class="quick-add-btn" onclick="quickFill('dapur', 'Daging Sapi')">Daging</button>
+      <div class="flex flex-wrap gap-2 mb-4">
+        <button type="button" class="px-3 py-1 bg-slate-100 rounded text-xs" onclick="quickFill('dapur','Beras')">Beras</button>
+        <button type="button" class="px-3 py-1 bg-slate-100 rounded text-xs" onclick="quickFill('dapur','Minyak')">Minyak</button>
+        <button type="button" class="px-3 py-1 bg-slate-100 rounded text-xs" onclick="quickFill('dapur','Telur')">Telur</button>
+        <button type="button" class="px-3 py-1 bg-slate-100 rounded text-xs" onclick="quickFill('dapur','Ayam')">Ayam</button>
       </div>
-
-      <button type="submit" class="submit-btn" id="dapur-submit-btn">💾 Update Stok Dapur</button>
+      <button type="submit" id="dapur-submit-btn" class="submit-btn bg-blue-600 hover:bg-blue-700">Update Stok</button>
      </form>
     </div>
-
-    <div class="form-card">
-     <h2>📊 Stok Dapur Real-time</h2>
-     <div class="stock-list" id="dapur-stock-list">
-      <div class="empty-state">Memuat data stok...</div>
-     </div>
-    </div>
+    <div id="dapur-stock-list" class="grid grid-cols-2 gap-3"></div>
    </div>
 
-   <!-- Tab Stok Bar -->
+   <!-- 3. STOK BAR -->
    <div class="tab-content" id="bar-tab">
     <div class="form-card">
-     <h2>🍷 Update Stok Bar</h2>
+     <div class="section-title">Update Stok Bar</div>
      <form id="barForm">
-      <div class="form-grid">
-       <div class="form-group">
-        <label for="bar-staff">Nama Staff (Barista) *</label>
-        <select id="bar-staff" required>
-         <option value="">-- Pilih Nama --</option>
-         <!-- Populated by JS -->
-        </select>
-       </div>
-       <div class="form-group">
-        <label for="bar-item">Nama Barang *</label>
-        <input type="text" id="bar-item" list="bar-items" required placeholder="Ketik atau pilih...">
-        <datalist id="bar-items"></datalist>
-       </div>
-       <div class="form-group">
-        <label for="bar-qty">Jumlah *</label>
-        <input type="number" id="bar-qty" min="1" required placeholder="0">
-       </div>
-       <div class="form-group">
-        <label for="bar-movement">Aksi *</label>
-        <select id="bar-movement" required>
-         <option value="masuk">➕ Barang Masuk (Beli/Datang)</option>
-         <option value="keluar">➖ Barang Keluar (Dipakai/Rusak)</option>
-        </select>
-       </div>
+      <div class="form-group"><label>Barista</label><select id="bar-staff" class="input-field" required><option value="">-- Pilih --</option></select></div>
+      <div class="form-group"><label>Barang</label><input type="text" id="bar-item" list="bar-items" class="input-field" required><datalist id="bar-items"></datalist></div>
+      <div class="flex gap-2">
+          <div class="form-group flex-1"><label>Jumlah</label><input type="number" id="bar-qty" class="input-field" required></div>
+          <div class="form-group flex-1"><label>Aksi</label><select id="bar-movement" class="input-field" required><option value="masuk">Masuk (+)</option><option value="keluar">Keluar (-)</option></select></div>
       </div>
-
-      <div class="quick-add-buttons">
-        <button type="button" class="quick-add-btn" onclick="quickFill('bar', 'Kopi Bubuk')">Kopi</button>
-        <button type="button" class="quick-add-btn" onclick="quickFill('bar', 'Susu UHT')">Susu</button>
-        <button type="button" class="quick-add-btn" onclick="quickFill('bar', 'Sirup Vanilla')">Sirup Vnl</button>
-        <button type="button" class="quick-add-btn" onclick="quickFill('bar', 'Es Batu')">Es Batu</button>
-        <button type="button" class="quick-add-btn" onclick="quickFill('bar', 'Gula Cair')">Gula Cair</button>
+      <div class="flex flex-wrap gap-2 mb-4">
+        <button type="button" class="px-3 py-1 bg-slate-100 rounded text-xs" onclick="quickFill('bar','Kopi Bubuk')">Kopi</button>
+        <button type="button" class="px-3 py-1 bg-slate-100 rounded text-xs" onclick="quickFill('bar','Susu UHT')">Susu</button>
+        <button type="button" class="px-3 py-1 bg-slate-100 rounded text-xs" onclick="quickFill('bar','Sirup')">Sirup</button>
+        <button type="button" class="px-3 py-1 bg-slate-100 rounded text-xs" onclick="quickFill('bar','Es Batu')">Es Batu</button>
       </div>
-
-      <button type="submit" class="submit-btn" id="bar-submit-btn">💾 Update Stok Bar</button>
+      <button type="submit" id="bar-submit-btn" class="submit-btn bg-purple-600 hover:bg-purple-700">Update Stok</button>
      </form>
     </div>
-
-    <div class="form-card">
-     <h2>📊 Stok Bar Real-time</h2>
-     <div class="stock-list" id="bar-stock-list">
-      <div class="empty-state">Memuat data stok...</div>
-     </div>
-    </div>
+    <div id="bar-stock-list" class="grid grid-cols-2 gap-3"></div>
    </div>
 
   </div>
-  
-  <div id="toast" class="toast">Notifikasi</div>
+  <div id="toast" class="toast">Notif</div>
 
   <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/11.0.2/firebase-app.js";
@@ -316,242 +229,266 @@
     const app = initializeApp(firebaseConfig);
     const db = getFirestore(app);
     const auth = getAuth(app);
-
     const getColRef = (name) => collection(db, name);
 
-    let isAppStarted = false;
-
-    // --- DATA KARYAWAN TERPUSAT ---
+    // --- DATA STAFF ---
     const staffList = [
-        { name: "Ilham Ali Naufal", role: "Pramusaji" },
-        { name: "Muhammad Zikrillah", role: "Pramusaji" },
-        { name: "Renita Aulia Jasmin", role: "Bartender" },
-        { name: "Rifky Arya Ramadhani", role: "Pramusaji" },
-        { name: "Ahmad Maulidan Noor", role: "Bartender" },
-        { name: "Rusdhani", role: "Kasir" },
-        { name: "Fitri Ainur Sabita", role: "Chef" },
-        { name: "Shada Amalia", role: "Chef" },
-        { name: "Ovy Putri Novia", role: "Chef" },
-        { name: "Jihan Permata Sari", role: "Kasir" },
-        { name: "Samlawi", role: "Bartender" },
-        { name: "Iqbal Arasyid", role: "Chef" },
-        { name: "Ansyari Fachmi Ridhani", role: "Bartender" },
-        { name: "Nahjatus Sabela", role: "Kasir" },
+        { name: "Ilham Ali Naufal", role: "Pramusaji" }, { name: "Muhammad Zikrillah", role: "Pramusaji" },
+        { name: "Renita Aulia Jasmin", role: "Bartender" }, { name: "Rifky Arya Ramadhani", role: "Pramusaji" },
+        { name: "Ahmad Maulidan Noor", role: "Bartender" }, { name: "Rusdhani", role: "Kasir" },
+        { name: "Fitri Ainur Sabita", role: "Chef" }, { name: "Shada Amalia", role: "Chef" },
+        { name: "Ovy Putri Novia", role: "Chef" }, { name: "Jihan Permata Sari", role: "Kasir" },
+        { name: "Samlawi", role: "Bartender" }, { name: "Iqbal Arasyid", role: "Chef" },
+        { name: "Ansyari Fachmi Ridhani", role: "Bartender" }, { name: "Nahjatus Sabela", role: "Kasir" },
         { name: "Komang sri yati utami", role: "Chef" }
     ];
 
-    function populateStaffSelects() {
-        const kasirSelect = document.getElementById('kas-staff');
-        const dapurSelect = document.getElementById('dapur-staff');
-        const barSelect = document.getElementById('bar-staff');
+    let expenseList = [];
 
-        // 1. Kasir (Hanya Kasir & Lainnya)
-        const kasirs = staffList.filter(s => s.role === "Kasir");
-        kasirSelect.innerHTML = '<option value="">-- Pilih Nama --</option>';
-        kasirs.forEach(s => kasirSelect.innerHTML += `<option value="${s.name}">${s.name} (${s.role})</option>`);
-        kasirSelect.innerHTML += `<option value="Lainnya">Lainnya</option>`;
-
-        // 2. Dapur (Chef & Lainnya)
-        const chefs = staffList.filter(s => s.role === "Chef");
-        const othersDapur = staffList.filter(s => s.role !== "Chef"); 
-        
-        dapurSelect.innerHTML = '<option value="">-- Pilih Chef/Koki --</option>';
-        chefs.forEach(s => dapurSelect.innerHTML += `<option value="${s.name}">${s.name} (${s.role})</option>`);
-        dapurSelect.innerHTML += '<option disabled>-- Karyawan Lain --</option>';
-        othersDapur.forEach(s => dapurSelect.innerHTML += `<option value="${s.name}">${s.name} (${s.role})</option>`);
-
-        // 3. Bar (Bartender & Lainnya)
-        const bartenders = staffList.filter(s => s.role === "Bartender");
-        const othersBar = staffList.filter(s => s.role !== "Bartender");
-
-        barSelect.innerHTML = '<option value="">-- Pilih Barista --</option>';
-        bartenders.forEach(s => barSelect.innerHTML += `<option value="${s.name}">${s.name} (${s.role})</option>`);
-        barSelect.innerHTML += '<option disabled>-- Karyawan Lain --</option>';
-        othersBar.forEach(s => barSelect.innerHTML += `<option value="${s.name}">${s.name} (${s.role})</option>`);
+    // --- INIT ---
+    function init() {
+        populateStaff();
+        loadHistory();
+        loadStock('inventory_kitchen', 'dapur-stock-list', 'dapur-items');
+        loadStock('inventory_bar', 'bar-stock-list', 'bar-items');
     }
 
-    function startAppListeners() {
-        if (isAppStarted) return;
-        isAppStarted = true;
-        console.log("Starting app listeners...");
-        populateStaffSelects(); // Isi dropdown nama
-        loadShiftHistory();
-        loadInventory('inventory_kitchen', 'dapur-stock-list', 'dapur-items');
-        loadInventory('inventory_bar', 'bar-stock-list', 'bar-items');
-    }
-
-    const initAuth = async () => {
-        try { await signInAnonymously(auth); } 
-        catch (error) { console.warn("Auth failed, starting anyway.", error.code); startAppListeners(); }
-    };
+    const initAuth = async () => { try { await signInAnonymously(auth); } catch(e){} init(); };
     initAuth();
+    onAuthStateChanged(auth, (u) => { if(u) init(); });
 
-    onAuthStateChanged(auth, (user) => { if (user) startAppListeners(); });
+    function populateStaff() {
+        const fill = (id, role) => {
+            const el = document.getElementById(id);
+            el.innerHTML = '<option value="">-- Pilih --</option>';
+            staffList.filter(s => s.role === role).forEach(s => el.innerHTML += `<option value="${s.name}">${s.name}</option>`);
+            el.innerHTML += '<option value="Lainnya">Lainnya</option>';
+        };
+        fill('kas-staff', 'Kasir');
+        fill('dapur-staff', 'Chef');
+        fill('bar-staff', 'Bartender');
+    }
 
-    // --- UI & Logic ---
-    function updateCurrentShift() {
-        const hour = new Date().getHours();
-        let shift = 'Pagi', cls = 'shift-pagi';
-        if (hour >= 16 && hour < 23) { shift = 'Siang'; cls = 'shift-siang'; }
-        else if (hour >= 23 || hour < 8) { shift = 'Malam'; cls = 'shift-malam'; }
-
+    // --- LOGIC SHIFT & DATE ---
+    function getShift() {
+        const h = new Date().getHours();
         const badge = document.getElementById('current-shift-badge');
-        if (badge) badge.innerHTML = `<span class="shift-badge ${cls}">Shift ${shift} Aktif</span>`;
-        return shift;
+        let s = 'Pagi', c = 'bg-yellow-100 text-yellow-800';
+        if(h >= 16 && h < 23) { s = 'Siang'; c = 'bg-blue-100 text-blue-800'; }
+        else if(h >= 23 || h < 8) { s = 'Malam'; c = 'bg-purple-100 text-purple-800'; }
+        if(badge) badge.innerHTML = `<span class="px-3 py-1 rounded-full text-xs font-bold ${c}">Shift ${s} Aktif</span>`;
+        return s;
     }
-    updateCurrentShift();
-    setInterval(updateCurrentShift, 60000);
+    getShift(); setInterval(getShift, 60000);
 
-    function getOperationalDateString() {
-        const now = new Date();
-        if (now.getHours() < 8) now.setDate(now.getDate() - 1);
-        return now.toLocaleDateString('id-ID');
+    function getOpDate() {
+        const d = new Date();
+        if(d.getHours() < 8) d.setDate(d.getDate() - 1);
+        return d.toLocaleDateString('id-ID');
     }
 
-    ['modal-awal', 'penjualan-cash', 'bon-keluar'].forEach(id => {
-        document.getElementById(id).addEventListener('input', () => {
-            const modal = parseInt(document.getElementById('modal-awal').value) || 0;
-            const cash = parseInt(document.getElementById('penjualan-cash').value) || 0;
-            const bon = parseInt(document.getElementById('bon-keluar').value) || 0;
-            const total = modal + cash - bon;
+    // --- EXPENSES & CALCULATOR ---
+    window.addExpense = () => {
+        const catEl = document.getElementById('exp-category');
+        const desc = document.getElementById('exp-desc').value;
+        const amt = parseInt(document.getElementById('exp-amt').value) || 0;
+        
+        if(!catEl.value || !desc || amt <= 0) { showToast('Lengkapi data pengeluaran!'); return; }
+        
+        // Simpan COA code dan nama kategori
+        const catName = catEl.options[catEl.selectedIndex].text;
+        expenseList.push({ categoryCode: catEl.value, categoryName: catName, desc, amount: amt });
+        
+        renderExp();
+        document.getElementById('exp-desc').value = '';
+        document.getElementById('exp-amt').value = '';
+    }
 
-            document.getElementById('calc-modal').textContent = formatRupiah(modal);
-            document.getElementById('calc-cash').textContent = formatRupiah(cash);
-            document.getElementById('calc-bon').textContent = "- " + formatRupiah(bon);
-            document.getElementById('calc-total').textContent = formatRupiah(total);
+    window.removeExpense = (i) => { expenseList.splice(i, 1); renderExp(); }
+
+    function renderExp() {
+        const con = document.getElementById('expense-list-container');
+        const totalInput = document.getElementById('total-expenses');
+        con.innerHTML = '';
+        let total = 0;
+        
+        expenseList.forEach((e, i) => {
+            total += e.amount;
+            con.innerHTML += `<div class="expense-item"><span>[${e.categoryName}] ${e.desc}</span><span>${fmt(e.amount)} <b onclick="removeExpense(${i})" class="ml-2 cursor-pointer text-red-500">x</b></span></div>`;
         });
+        
+        con.classList.toggle('hidden', expenseList.length === 0);
+        totalInput.value = total;
+        calc();
+    }
+
+    function calc() {
+        const modal = parseInt(document.getElementById('modal-awal').value) || 0;
+        const fnbCash = parseInt(document.getElementById('penjualan-cash').value) || 0;
+        
+        // Pendapatan Lain (Cash In)
+        const incKar = parseInt(document.getElementById('inc-karaoke').value) || 0;
+        const incMas = parseInt(document.getElementById('inc-massage').value) || 0;
+        const incHyp = parseInt(document.getElementById('inc-hypno').value) || 0;
+        const totalServices = incKar + incMas + incHyp;
+
+        const exp = parseInt(document.getElementById('total-expenses').value) || 0;
+        const total = modal + fnbCash + totalServices - exp;
+
+        document.getElementById('calc-modal').innerText = fmt(modal);
+        document.getElementById('calc-fnb').innerText = fmt(fnbCash);
+        document.getElementById('calc-services').innerText = fmt(totalServices);
+        document.getElementById('calc-exp').innerText = "- " + fmt(exp);
+        document.getElementById('calc-total').innerText = fmt(total);
+    }
+
+    ['modal-awal', 'penjualan-cash', 'inc-karaoke', 'inc-massage', 'inc-hypno'].forEach(id => {
+        document.getElementById(id).addEventListener('input', calc);
     });
 
+    // --- SUBMIT SHIFT ---
     document.getElementById('kasForm').addEventListener('submit', async (e) => {
         e.preventDefault();
         const btn = document.getElementById('kas-submit-btn');
-        btn.disabled = true; btn.textContent = '⏳ Menyimpan...';
+        btn.disabled = true; btn.innerText = 'Menyimpan...';
 
         try {
             const modal = parseInt(document.getElementById('modal-awal').value) || 0;
             const cash = parseInt(document.getElementById('penjualan-cash').value) || 0;
-            const bon = parseInt(document.getElementById('bon-keluar').value) || 0;
+            const qris = parseInt(document.getElementById('penjualan-qris').value) || 0;
+            
+            // Extra Incomes
+            const incKar = parseInt(document.getElementById('inc-karaoke').value) || 0;
+            const incMas = parseInt(document.getElementById('inc-massage').value) || 0;
+            const incHyp = parseInt(document.getElementById('inc-hypno').value) || 0;
+            
+            const exp = parseInt(document.getElementById('total-expenses').value) || 0;
             const fisik = parseInt(document.getElementById('fisik-laci').value) || 0;
-            const expected = modal + cash - bon;
+            const expected = modal + cash + incKar + incMas + incHyp - exp;
 
             await addDoc(getColRef('shift_reports'), {
                 staffName: document.getElementById('kas-staff').value,
-                shift: updateCurrentShift(), 
-                date: getOperationalDateString(),
-                realDate: new Date().toLocaleDateString('id-ID'),
-                startCash: modal, cashSales: cash, 
-                qrisSales: parseInt(document.getElementById('penjualan-qris').value) || 0,
-                expenses: bon, bonDescription: document.getElementById('bon-desc').value,
-                expectedCash: expected, physicalCash: fisik, difference: fisik - expected,
+                shift: getShift(),
+                date: getOpDate(),
+                realDate: new Date().toISOString(),
+                // Financial Data
+                startCash: modal,
+                cashSales: cash,
+                qrisSales: qris,
+                // New Income Fields
+                incomeKaraoke: incKar,
+                incomeMassage: incMas,
+                incomeHypno: incHyp,
+                // Expenses
+                expenses: exp,
+                expenseDetails: expenseList, // Array with COA codes
+                // Balance
+                expectedCash: expected,
+                physicalCash: fisik,
+                difference: fisik - expected,
                 notes: document.getElementById('shift-notes').value,
-                timestamp: serverTimestamp(), createdAt: serverTimestamp()
+                timestamp: serverTimestamp(),
+                createdAt: serverTimestamp()
             });
 
-            showToast('✅ Laporan Berhasil Disimpan!');
-            document.getElementById('kasForm').reset();
-            document.getElementById('calc-total').textContent = 'Rp 0';
-        } catch (err) { console.error(err); showToast('❌ Gagal menyimpan'); } 
-        finally { btn.disabled = false; btn.textContent = '💾 Simpan Laporan'; }
+            showToast('Laporan Shift Tersimpan!');
+            setTimeout(() => location.reload(), 1500);
+        } catch(err) { console.error(err); showToast('Gagal menyimpan'); btn.disabled = false; }
     });
 
-    function loadShiftHistory() {
+    // --- HISTORY (With Error Handling) ---
+    function loadHistory() {
         try {
             const q = query(getColRef("shift_reports"), orderBy("createdAt", "desc"));
-            onSnapshot(q, (snapshot) => {
-                const container = document.getElementById('kas-history');
-                const todayOperational = getOperationalDateString();
-                const logs = snapshot.docs.map(d => d.data()).filter(d => d.date === todayOperational);
-
-                if (logs.length === 0) { container.innerHTML = '<div class="empty-state">Belum ada laporan hari ini</div>'; return; }
-
-                container.innerHTML = logs.map(log => `
-                    <div class="history-item">
-                        <div><div style="font-weight: 700; color: #334155;">${log.staffName} <span style="font-weight:400; color: #94a3b8;">(${log.shift})</span></div><div style="font-size: 11px; margin-top: 2px;">Fisik: ${formatRupiah(log.physicalCash)}</div></div>
-                        <div style="text-align: right;"><div style="font-size: 11px; color: #94a3b8;">Selisih</div><div style="font-weight: 700; color: ${log.difference < 0 ? '#ef4444' : '#10b981'};">${log.difference > 0 ? '+' : ''}${formatRupiah(log.difference)}</div></div>
+            onSnapshot(q, (snap) => {
+                const con = document.getElementById('kas-history');
+                const today = getOpDate();
+                const logs = snap.docs.map(d => d.data()).filter(d => d.date === today);
+                
+                if(!logs.length) { con.innerHTML = '<div class="text-center italic text-gray-400">Belum ada data hari ini</div>'; return; }
+                
+                con.innerHTML = logs.map(l => `
+                    <div class="flex justify-between p-3 bg-slate-50 rounded border-l-4 border-emerald-500 mb-2">
+                        <div>
+                            <div class="font-bold text-slate-700">${l.staffName} <span class="font-normal text-xs text-slate-500">(${l.shift})</span></div>
+                            <div class="text-xs text-slate-500">Fisik: ${fmt(l.physicalCash)}</div>
+                        </div>
+                        <div class="text-right">
+                            <div class="text-xs text-slate-400">Selisih</div>
+                            <div class="font-bold ${l.difference < 0 ? 'text-red-500' : 'text-emerald-600'}">${l.difference > 0 ? '+' : ''}${fmt(l.difference)}</div>
+                        </div>
                     </div>
                 `).join('');
-            }, (error) => { console.warn("History denied"); document.getElementById('kas-history').innerHTML = '<div class="empty-state text-red-400">Login diperlukan</div>'; });
-        } catch(e) {}
+            }, (error) => {
+                // Graceful error handling for missing permissions
+                console.warn("History access denied:", error.message);
+                document.getElementById('kas-history').innerHTML = '<div class="text-center text-red-400 text-xs py-2">Data Riwayat tidak dapat dimuat (Izin Ditolak)</div>';
+            });
+        } catch(e){}
     }
 
-    const handleStockSubmit = async (e, type) => {
+    // --- INVENTORY (With Error Handling) ---
+    const handleStock = async (e, type) => {
         e.preventDefault();
-        const collName = type === 'dapur' ? 'inventory_kitchen' : 'inventory_bar';
-        const staffField = type === 'dapur' ? 'dapur-staff' : 'bar-staff';
-        const btn = document.getElementById(`${type}-submit-btn`);
-        btn.disabled = true; btn.textContent = '⏳ Mengupdate...';
-
-        const staffName = document.getElementById(staffField).value;
-        const itemName = document.getElementById(`${type}-item`).value.trim();
+        const coll = type === 'dapur' ? 'inventory_kitchen' : 'inventory_bar';
+        const staff = document.getElementById(`${type}-staff`).value;
+        const item = document.getElementById(`${type}-item`).value;
         const qty = parseInt(document.getElementById(`${type}-qty`).value) || 0;
-        const movement = document.getElementById(`${type}-movement`).value;
+        const move = document.getElementById(`${type}-movement`).value;
+        const btn = document.getElementById(`${type}-submit-btn`);
 
-        if (!staffName || !itemName || qty <= 0) {
-            showToast('⚠️ Lengkapi semua data!');
-            btn.disabled = false; btn.textContent = `💾 Update Stok ${type}`;
-            return;
-        }
+        if(!staff || !item || qty <= 0) return;
+        btn.disabled = true; btn.innerText = '...';
 
         try {
-            const q = query(getColRef(collName), where('name', '==', itemName));
-            const snapshot = await getDocs(q);
-
-            if (!snapshot.empty) {
-                const docId = snapshot.docs[0].id;
-                const currentStock = snapshot.docs[0].data().stock || 0;
-                const newStock = movement === 'masuk' ? currentStock + qty : currentStock - qty;
-                await updateDoc(doc(db, collName, docId), { stock: newStock, lastUpdate: serverTimestamp(), lastUser: staffName });
+            const q = query(getColRef(coll), where('name', '==', item));
+            const snap = await getDocs(q);
+            if(!snap.empty) {
+                const docId = snap.docs[0].id;
+                const cur = snap.docs[0].data().stock || 0;
+                await updateDoc(doc(db, coll, docId), { stock: move==='masuk' ? cur+qty : cur-qty, lastUpdate: serverTimestamp(), lastUser: staff });
             } else {
-                await addDoc(getColRef(collName), {
-                    name: itemName, stock: movement === 'masuk' ? qty : 0, unit: 'pcs', lastUpdate: serverTimestamp(), lastUser: staffName
-                });
+                await addDoc(getColRef(coll), { name: item, stock: move==='masuk' ? qty : 0, unit: 'pcs', lastUpdate: serverTimestamp(), lastUser: staff });
             }
-            showToast(`✅ Stok ${itemName} diupdate!`);
+            showToast('Stok Diupdate!');
             document.getElementById(`${type}Form`).reset();
-        } catch (err) { console.error(err); showToast('❌ Gagal update'); } 
-        finally { btn.disabled = false; btn.textContent = `💾 Update Stok ${type}`; }
+        } catch(e) { showToast('Gagal update: ' + e.message); }
+        finally { btn.disabled = false; btn.innerText = 'Update Stok'; }
     };
+    document.getElementById('dapurForm').addEventListener('submit', e => handleStock(e, 'dapur'));
+    document.getElementById('barForm').addEventListener('submit', e => handleStock(e, 'bar'));
 
-    document.getElementById('dapurForm').addEventListener('submit', (e) => handleStockSubmit(e, 'dapur'));
-    document.getElementById('barForm').addEventListener('submit', (e) => handleStockSubmit(e, 'bar'));
-
-    function loadInventory(collName, listId, datalistId) {
-        const q = query(getColRef(collName), orderBy("name"));
-        onSnapshot(q, (snapshot) => {
-            const container = document.getElementById(listId);
-            const datalist = document.getElementById(datalistId);
-            const items = snapshot.docs.map(d => d.data());
-
-            datalist.innerHTML = items.map(i => `<option value="${i.name}">`).join('');
-            if (items.length === 0) { container.innerHTML = '<div class="empty-state">Stok kosong</div>'; return; }
-
-            container.innerHTML = items.map(item => `
-                <div class="stock-item-card">
-                    <div class="stock-item-name">${item.name}</div>
-                    <div class="stock-item-qty">${item.stock}</div>
-                    <div class="stock-item-info">User: ${item.lastUser || '-'}</div>
-                    <div class="stock-item-info" style="margin-top:2px;">${item.lastUpdate ? new Date(item.lastUpdate.seconds*1000).toLocaleTimeString('id-ID', {hour:'2-digit', minute:'2-digit'}) : 'Baru'}</div>
+    function loadStock(coll, listId, dataId) {
+        onSnapshot(query(getColRef(coll), orderBy("name")), (snap) => {
+            const con = document.getElementById(listId);
+            const dl = document.getElementById(dataId);
+            const items = snap.docs.map(d => d.data());
+            dl.innerHTML = items.map(i => `<option value="${i.name}">`).join('');
+            con.innerHTML = items.map(i => `
+                <div class="bg-white p-3 rounded border border-slate-200 text-center">
+                    <div class="font-bold text-slate-700 text-sm truncate">${i.name}</div>
+                    <div class="text-xl font-bold text-emerald-600">${i.stock}</div>
+                    <div class="text-[10px] text-slate-400 mt-1">${i.lastUser||'-'}</div>
                 </div>
             `).join('');
+        }, (error) => {
+             console.warn("Stock access denied:", error.message);
+             document.getElementById(listId).innerHTML = '<div class="col-span-2 text-center text-red-400 text-xs">Gagal memuat stok (Izin Ditolak)</div>';
         });
     }
 
-    window.quickFill = (type, item) => {
-        document.getElementById(`${type}-item`).value = item;
-        document.getElementById(`${type}-qty`).focus();
-    };
-
-    function formatRupiah(num) { return 'Rp ' + (num || 0).toLocaleString('id-ID'); }
-    function showToast(msg) { const t = document.getElementById('toast'); t.textContent = msg; t.classList.add('show'); setTimeout(() => t.classList.remove('show'), 3000); }
-
-    document.querySelectorAll('.tab-btn').forEach(btn => {
-        btn.addEventListener('click', () => {
-            document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
-            document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
-            btn.classList.add('active');
-            document.getElementById(btn.dataset.tab + '-tab').classList.add('active');
-        });
-    });
+    // --- UTILS ---
+    window.quickFill = (t, v) => { document.getElementById(`${t}-item`).value = v; document.getElementById(`${t}-qty`).focus(); };
+    function fmt(n) { return 'Rp ' + (n||0).toLocaleString('id-ID'); }
+    function showToast(m) { const t = document.getElementById('toast'); t.innerText = m; t.classList.add('show'); setTimeout(()=>t.classList.remove('show'), 3000); }
+    
+    // Tab
+    document.querySelectorAll('.tab-btn').forEach(b => b.addEventListener('click', () => {
+        document.querySelectorAll('.tab-btn').forEach(x => x.classList.remove('active'));
+        document.querySelectorAll('.tab-content').forEach(x => x.classList.remove('active'));
+        b.classList.add('active');
+        document.getElementById(`${b.dataset.tab}-tab`).classList.add('active');
+    }));
   </script>
  </body>
 </html>
