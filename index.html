@@ -3,7 +3,7 @@
  <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Staff Ops - COA Integrated</title>
+  <title>Staff Ops - Cash Flow Integrated</title>
   <script src="https://cdn.tailwindcss.com"></script>
   <style>
     body { font-family: 'Inter', sans-serif; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); min-height: 100vh; }
@@ -295,14 +295,14 @@
         fill('bar-staff', 'Bartender');
     }
 
-    // --- LOGIC SHIFT ---
+    // --- LOGIC SHIFT (FIXED) ---
     function getShift() {
         const h = new Date().getHours();
         const badge = document.getElementById('current-shift-badge');
         let s = '', c = '';
-        if (h >= 0 && h < 8) { s = 'Pagi'; c = 'bg-yellow-100 text-yellow-800'; }
-        else if (h >= 8 && h < 16) { s = 'Siang'; c = 'bg-emerald-100 text-emerald-800'; }
-        else { s = 'Malam'; c = 'bg-purple-100 text-purple-800'; }
+        if (h >= 0 && h < 8) { s = 'Pagi'; c = 'bg-yellow-100 text-yellow-800'; } // 00-08
+        else if (h >= 8 && h < 16) { s = 'Siang'; c = 'bg-emerald-100 text-emerald-800'; } // 08-16
+        else { s = 'Malam'; c = 'bg-purple-100 text-purple-800'; } // 16-24
         
         if(badge) badge.innerHTML = `<span class="px-3 py-1 rounded-full text-xs font-bold ${c}">Shift ${s} Aktif (${h}:00)</span>`;
         return s;
@@ -311,7 +311,7 @@
 
     function getOpDate() {
         const d = new Date();
-        // Shift Pagi (00-08) tetap dihitung hari ini (Tidak mundur hari)
+        // Tanggal sesuai kalender (karena shift pagi sekarang start jam 00:00)
         return d.toLocaleDateString('id-ID');
     }
 
@@ -502,7 +502,7 @@
             }
             showToast('Stok Diupdate!');
             document.getElementById(`${type}Form`).reset();
-        } catch(e) { showToast('Gagal update'); }
+        } catch(e) { showToast('Gagal update: ' + e.message); }
         finally { btn.disabled = false; btn.innerText = 'Update Stok'; }
     };
     document.getElementById('dapurForm').addEventListener('submit', e => handleStock(e, 'dapur'));
@@ -522,15 +522,15 @@
                 </div>
             `).join('');
         }, (error) => {
-            console.warn("Stock denied:", error.message);
-            document.getElementById(listId).innerHTML = '<div class="col-span-2 text-center text-red-400 text-xs">Gagal memuat stok</div>';
+             console.warn("Stock access denied:", error.message);
+             document.getElementById(listId).innerHTML = '<div class="col-span-2 text-center text-red-400 text-xs">Gagal memuat stok (Izin Ditolak)</div>';
         });
     }
 
     // --- UTILS ---
     window.quickFill = (t, v) => { document.getElementById(`${t}-item`).value = v; document.getElementById(`${t}-qty`).focus(); };
     function fmt(n) { return 'Rp ' + (n||0).toLocaleString('id-ID'); }
-    function showToast(m) { const t = document.getElementById('toast'); t.innerText = m; t.classList.add('show'); setTimeout(()=>t.classList.remove('show'), 3000); }
+    function showToast(m) { const t = document.getElementById('toast'); t.innerText = m; t.classList.add('show'); setTimeout(()=>t.classList.remove('show'),3000); }
     
     // Tab
     document.querySelectorAll('.tab-btn').forEach(b => b.addEventListener('click', () => {
